@@ -38,15 +38,11 @@ func main() {
 	commando.
 		Register(nil).
 		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-
 			tilbits := parseFile("data/database.txt")
 
-			rand.Seed(time.Now().UnixNano())
-			randomIndex := rand.Intn(len(tilbits))
+			randTil := getRandomBit(tilbits)
 
-			randTil := tilbits[randomIndex]
 			fmt.Println(getBitString(randTil))
-
 		})
 
 	// configure info command
@@ -74,9 +70,7 @@ func main() {
 	commando.Parse(nil)
 }
 
-func parseFile(file string) []Tilbit {
-	var tilbits = []Tilbit{}
-
+func parseFile(file string) (tilbits []Tilbit) {
 	f, _ := os.Open(file)
 	scanner := bufio.NewScanner(f)
 
@@ -87,13 +81,10 @@ func parseFile(file string) []Tilbit {
 			continue
 		}
 
-		// Split the line on commas.
 		parts := strings.Split(line, "{")
-
 		if len(parts) != 2 {
 			errors.New(fmt.Sprintf("Unexpected parse of line with metadata: %s", line))
 		}
-		// Loop over the parts from the string.
 
 		text := parts[0]
 		jsonstr := "{" + parts[1]
@@ -107,7 +98,13 @@ func parseFile(file string) []Tilbit {
 		tilbits = append(tilbits, tilbit)
 		// fmt.Println(tilbits[0].Text)
 	}
-	return tilbits
+	return
+}
+
+func getRandomBit(tilbits []Tilbit) (randomTilbit Tilbit) {
+	rand.Seed(time.Now().UnixNano())
+	randomTilbit = tilbits[rand.Intn(len(tilbits))]
+	return
 }
 
 func getBitString(tilbit Tilbit) (str string, err error) {
