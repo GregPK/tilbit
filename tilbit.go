@@ -38,38 +38,9 @@ func main() {
 	commando.
 		Register(nil).
 		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-			f, _ := os.Open("data/database.txt")
-			scanner := bufio.NewScanner(f)
 
-			var tilbits = []Tilbit{}
+			tilbits := parseFile("data/database.txt")
 
-			for scanner.Scan() {
-				line := strings.Trim(scanner.Text(), " ")
-
-				if line == "" {
-					continue
-				}
-
-				// Split the line on commas.
-				parts := strings.Split(line, "{")
-
-				if len(parts) != 2 {
-					errors.New(fmt.Sprintf("Unexpected parse of line with metadata: %s", line))
-				}
-				// Loop over the parts from the string.
-
-				text := parts[0]
-				jsonstr := "{" + parts[1]
-
-				var tilbit Tilbit
-				var metadata TilbitData
-				json.Unmarshal([]byte(jsonstr), &metadata)
-				tilbit.Text = text
-				tilbit.Data = metadata
-
-				tilbits = append(tilbits, tilbit)
-				// fmt.Println(tilbits[0].Text)
-			}
 			rand.Seed(time.Now().UnixNano())
 			randomIndex := rand.Intn(len(tilbits))
 
@@ -101,6 +72,42 @@ func main() {
 
 	// parse command-line arguments
 	commando.Parse(nil)
+}
+
+func parseFile(file string) []Tilbit {
+	var tilbits = []Tilbit{}
+
+	f, _ := os.Open(file)
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		line := strings.Trim(scanner.Text(), " ")
+
+		if line == "" {
+			continue
+		}
+
+		// Split the line on commas.
+		parts := strings.Split(line, "{")
+
+		if len(parts) != 2 {
+			errors.New(fmt.Sprintf("Unexpected parse of line with metadata: %s", line))
+		}
+		// Loop over the parts from the string.
+
+		text := parts[0]
+		jsonstr := "{" + parts[1]
+
+		var tilbit Tilbit
+		var metadata TilbitData
+		json.Unmarshal([]byte(jsonstr), &metadata)
+		tilbit.Text = text
+		tilbit.Data = metadata
+
+		tilbits = append(tilbits, tilbit)
+		// fmt.Println(tilbits[0].Text)
+	}
+	return tilbits
 }
 
 func getBitString(tilbit Tilbit) (str string, err error) {
