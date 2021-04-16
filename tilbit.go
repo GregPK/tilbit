@@ -74,8 +74,7 @@ func main() {
 			randomIndex := rand.Intn(len(tilbits))
 
 			randTil := tilbits[randomIndex]
-			fmt.Println(wordwrap.WrapString(randTil.Text, 120))
-			fmt.Println("   --", randTil.Data.Source, "( "+randTil.Data.AddedOn+" )")
+			fmt.Println(getBitString(randTil))
 
 		})
 
@@ -102,5 +101,11 @@ func main() {
 
 	// parse command-line arguments
 	commando.Parse(nil)
+}
 
+func getBitString(tilbit Tilbit) (str string, err error) {
+	text := wordwrap.WrapString(tilbit.Text, 120)
+	footer := fmt.Sprintf("   -- %s (%s)", tilbit.Data.Source, tilbit.Data.AddedOn)
+	str = fmt.Sprintf("%s\n%s", text, footer)
+	return
 }
