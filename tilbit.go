@@ -38,7 +38,7 @@ func main() {
 	commando.
 		Register(nil).
 		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-			tilbits := parseFile("data/database.txt")
+			tilbits := parseFile("data/private.txt")
 
 			randTil := getRandomBit(tilbits)
 
@@ -103,6 +103,7 @@ func parseFile(file string) (tilbits []Tilbit) {
 
 func getRandomBit(tilbits []Tilbit) (randomTilbit Tilbit) {
 	rand.Seed(time.Now().UnixNano())
+	fmt.Printf("%s:\n", len(tilbits))
 	randomTilbit = tilbits[rand.Intn(len(tilbits))]
 	return
 }

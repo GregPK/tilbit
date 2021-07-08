@@ -12,8 +12,8 @@ tilbit
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Ignore data dir cause it might have private TILs
-data/
+# Ignore private TILs
+data/private.txt
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
