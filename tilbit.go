@@ -38,7 +38,8 @@ func main() {
 	commando.
 		Register(nil).
 		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-			tilbits := parseFile("data/private.txt")
+			homeDir, _ := os.UserHomeDir()
+			tilbits := parseFile(homeDir + "/.config/tilbit/data/private.txt")
 
 			randTil := getRandomBit(tilbits)
 
@@ -71,7 +72,10 @@ func main() {
 }
 
 func parseFile(file string) (tilbits []Tilbit) {
-	f, _ := os.Open(file)
+	f, err := os.Open(file)
+	if err != nil {
+        panic(err)
+    }
 	scanner := bufio.NewScanner(f)
 
 	for scanner.Scan() {
@@ -103,7 +107,7 @@ func parseFile(file string) (tilbits []Tilbit) {
 
 func getRandomBit(tilbits []Tilbit) (randomTilbit Tilbit) {
 	rand.Seed(time.Now().UnixNano())
-	fmt.Printf("%s:\n", len(tilbits))
+  // fmt.Printf("%s:\n", len(tilbits))
 	randomTilbit = tilbits[rand.Intn(len(tilbits))]
 	return
 }
