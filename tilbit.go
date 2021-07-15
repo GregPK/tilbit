@@ -32,14 +32,13 @@ func main() {
 	commando.
 		SetExecutableName("tilbit").
 		SetVersion("0.0.1").
-		SetDescription("TIL bit")
+		SetDescription("TILBit")
 
 	// configure the root command
 	commando.
 		Register(nil).
 		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-			homeDir, _ := os.UserHomeDir()
-			tilbits := parseFile(homeDir + "/.config/tilbit/data/private.txt")
+			tilbits := parseFile(privateDbFilename())
 
 			randTil := getRandomBit(tilbits)
 
@@ -48,34 +47,30 @@ func main() {
 
 	// configure info command
 	commando.
-		Register("info").
-		SetShortDescription("displays detailed information of a directory").
-		SetDescription("This command displays more information about the contents of the directory like size, permission and ownership, etc.").
-		AddArgument("dir", "local directory path", "./").                  // default `./`
-		AddFlag("level,l", "level of depth to travel", commando.Int, nil). // required
+		Register("add").
+		SetShortDescription("Add a TILBit").
+		SetDescription("This commands add an item to the private TILBit database.").
+		AddArgument("content", "Body of the TILBit", "").
+		AddArgument("source", "Source of the TILBit", "").
+		// AddFlag("stdin,s", "", commando.Int, nil). // required
 		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-			fmt.Printf("Printing options of the `info` command...\n\n")
-
-			// print arguments
-			for k, v := range args {
-				fmt.Printf("arg -> %v: %v(%T)\n", k, v.Value, v.Value)
-			}
-
-			// print flags
-			for k, v := range flags {
-				fmt.Printf("flag -> %v: %v(%T)\n", k, v.Value, v.Value)
-			}
+			addTil(args["content"].Value, args["source"].Value)
 		})
 
 	// parse command-line arguments
 	commando.Parse(nil)
 }
 
+func privateDbFilename() string {
+	homeDir, _ := os.UserHomeDir()
+	return homeDir + "/.config/tilbit/data/private.txt"
+}
+
 func parseFile(file string) (tilbits []Tilbit) {
 	f, err := os.Open(file)
 	if err != nil {
-        panic(err)
-    }
+		panic(err)
+	}
 	scanner := bufio.NewScanner(f)
 
 	for scanner.Scan() {
@@ -105,9 +100,32 @@ func parseFile(file string) (tilbits []Tilbit) {
 	return
 }
 
+func makeTilLine(content string, source string) (tilLine string) {
+	ISO8601 := "2006-_2-_1"
+	addedOn := time.Now().Format(ISO8601)
+
+	tilLine = fmt.Sprintf("%s, {\"source\": \"%s\", addedOn:\"%s\"}\n\n", content, source, addedOn)
+	return
+}
+
+func addTil(content string, source string) {
+	fmt.Printf("Adding [%s] with source [%s]\n", content, source)
+	f, err := os.OpenFile(privateDbFilename(), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	tilLine := makeTilLine(content, source)
+
+	if _, err = f.WriteString(tilLine); err != nil {
+		panic(err)
+	}
+}
+
 func getRandomBit(tilbits []Tilbit) (randomTilbit Tilbit) {
 	rand.Seed(time.Now().UnixNano())
-  // fmt.Printf("%s:\n", len(tilbits))
+	// fmt.Printf("%s:\n", len(tilbits))
 	randomTilbit = tilbits[rand.Intn(len(tilbits))]
 	return
 }
