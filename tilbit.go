@@ -99,7 +99,6 @@ func parseFile(file string) (tilbits []Tilbit) {
 	return
 }
 
-
 func addTil(content string, source string) {
 	fmt.Printf("Adding [%s] with source [%s]\n", content, source)
 	f, err := os.OpenFile(privateDbFilename(), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
