@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mitchellh/go-wordwrap"
 	"github.com/thatisuday/commando"
 )
 
@@ -31,7 +30,7 @@ func main() {
 	// configure commando
 	commando.
 		SetExecutableName("tilbit").
-		SetVersion("0.0.1").
+		SetVersion("0.0.2").
 		SetDescription("TILBit")
 
 	// configure the root command
@@ -100,13 +99,6 @@ func parseFile(file string) (tilbits []Tilbit) {
 	return
 }
 
-func makeTilLine(content string, source string) (tilLine string) {
-	ISO8601 := "2006-_2-_1"
-	addedOn := time.Now().Format(ISO8601)
-
-	tilLine = fmt.Sprintf("%s, {\"source\": \"%s\", addedOn:\"%s\"}\n\n", content, source, addedOn)
-	return
-}
 
 func addTil(content string, source string) {
 	fmt.Printf("Adding [%s] with source [%s]\n", content, source)
@@ -127,12 +119,5 @@ func getRandomBit(tilbits []Tilbit) (randomTilbit Tilbit) {
 	rand.Seed(time.Now().UnixNano())
 	// fmt.Printf("%s:\n", len(tilbits))
 	randomTilbit = tilbits[rand.Intn(len(tilbits))]
-	return
-}
-
-func getBitString(tilbit Tilbit) (str string, err error) {
-	text := wordwrap.WrapString(tilbit.Text, 120)
-	footer := fmt.Sprintf("   -- %s (%s)", tilbit.Data.Source, tilbit.Data.AddedOn)
-	str = fmt.Sprintf("%s\n%s", text, footer)
 	return
 }
