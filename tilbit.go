@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/thatisuday/commando"
+	"github.com/spf13/cobra"
 )
 
 type Tilbit struct {
@@ -27,37 +27,38 @@ type TilbitData struct {
 }
 
 func main() {
-	// configure commando
-	commando.
-		SetExecutableName("tilbit").
-		SetVersion("0.0.2").
-		SetDescription("TILBit")
-
-	// configure the root command
-	commando.
-		Register(nil).
-		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
+	var rootCmd = &cobra.Command{
+		Use:   "tilbit",
+		Short: "TILBit",
+		Long: `A Fast and Flexible Static Site Generator built with
+					  love by spf13 and friends in Go.
+					  Complete documentation is available at http://hugo.spf13.com`,
+		Run: func(cmd *cobra.Command, args []string) {
 			tilbits := parseFile(privateDbFilename())
 
 			randTil := getRandomBit(tilbits)
 
 			fmt.Println(getBitString(randTil))
-		})
+		},
+	  }
 
-	// configure info command
-	commando.
-		Register("add").
-		SetShortDescription("Add a TILBit").
-		SetDescription("This commands add an item to the private TILBit database.").
-		AddArgument("content", "Body of the TILBit", "").
-		AddArgument("source", "Source of the TILBit", "").
-		// AddFlag("stdin,s", "", commando.Int, nil). // required
-		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-			addTil(args["content"].Value, args["source"].Value)
-		})
+	var addCmd = &cobra.Command{
+		Use:   "add",
+		Short: "Add a TILBit",
+		Long:  `This commands add an item to the private TILBit database.`,
+		// AddArgument("content", "Body of the TILBit", "").
+		// AddArgument("source", "Source of the TILBit", "").
+		Args: cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			addTil(args[0], args[1])
+		},
+	}
+	rootCmd.AddCommand(addCmd)
 
-	// parse command-line arguments
-	commando.Parse(nil)
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
 
 func privateDbFilename() string {
