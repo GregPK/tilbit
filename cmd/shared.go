@@ -5,10 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/rand"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/GregPK/tilbit/core"
 )
@@ -49,27 +47,5 @@ func parseFile(file string) (tilbits []core.Tilbit) {
 		tilbits = append(tilbits, tilbit)
 		// fmt.Println(tilbits[0].Text)
 	}
-	return
-}
-
-func addTil(content string, source string) {
-	fmt.Printf("Adding [%s] with source [%s]\n", content, source)
-	f, err := os.OpenFile(privateDbFilename(), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-
-	tilLine := core.MakeTilLine(content, source)
-
-	if _, err = f.WriteString(tilLine); err != nil {
-		panic(err)
-	}
-}
-
-func getRandomBit(tilbits []core.Tilbit) (randomTilbit core.Tilbit) {
-	rand.Seed(time.Now().UnixNano())
-	// fmt.Printf("%s:\n", len(tilbits))
-	randomTilbit = tilbits[rand.Intn(len(tilbits))]
 	return
 }

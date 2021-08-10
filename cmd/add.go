@@ -1,6 +1,10 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/GregPK/tilbit/core"
 	"github.com/spf13/cobra"
 )
 
@@ -17,3 +21,18 @@ var (
 		},
 	}
 )
+
+func addTil(content string, source string) {
+	fmt.Printf("Adding [%s] with source [%s]\n", content, source)
+	f, err := os.OpenFile(privateDbFilename(), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	tilLine := core.MakeTilLine(content, source)
+
+	if _, err = f.WriteString(tilLine); err != nil {
+		panic(err)
+	}
+}
