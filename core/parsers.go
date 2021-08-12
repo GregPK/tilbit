@@ -1,6 +1,8 @@
 package core
 
 import (
+	"strings"
+
 	"gopkg.in/yaml.v2"
 )
 
@@ -14,5 +16,16 @@ func ParseMetadata(input string) (err error, metadata Metadata) {
 
 	err = yaml.Unmarshal([]byte(input), &metadata)
 
-	return err, metadata
+	return
+}
+
+func ParseMarkdown(input string) (err error, tilbits []Tilbit) {
+	texts := strings.Split(input, "\n\n")
+
+	for _, text := range texts {
+		text = strings.Trim(text, " \n")
+		tilbits = append(tilbits, Tilbit{text, TilbitData{}})
+	}
+
+	return
 }

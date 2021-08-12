@@ -17,3 +17,14 @@ url: https://twitter.com/g_s_bhogal/status/1225561131122597896
 	testza.AssertEqual(t, m.Url, "https://twitter.com/g_s_bhogal/status/1225561131122597896")
 	testza.AssertNil(t, err)
 }
+
+func TestMarkdownParserParagraphs(t *testing.T) {
+test := `
+**First TIL:** Content 1
+
+**Second TIL:** Content 2
+`
+	err, tilbits := ParseMarkdown(test)
+	testza.AssertEqual(t, len(tilbits), 2)
+	testza.AssertNil(t, err)
+}
