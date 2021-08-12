@@ -1,4 +1,3 @@
-
 package core
 
 type Tilbit struct {
