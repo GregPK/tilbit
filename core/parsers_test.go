@@ -26,5 +26,22 @@ test := `
 `
 	err, tilbits := ParseMarkdown(test)
 	testza.AssertEqual(t, len(tilbits), 2)
+	testza.AssertEqual(t, tilbits[0].Text, `**First TIL:** Content 1`)
+	testza.AssertEqual(t, tilbits[1].Text, `**Second TIL:** Content 2`)
+	testza.AssertNil(t, err)
+}
+
+func TestMarkdownParserLists(t *testing.T) {
+test := `
+**First TIL:** Content 1
+* First item
+* Second item
+
+**Second TIL:** Content 2
+`
+	err, tilbits := ParseMarkdown(test)
+	testza.AssertEqual(t, len(tilbits), 2)
+	testza.AssertEqual(t, tilbits[0].Text, "**First TIL:** Content 1\n* First item\n* Second item")
+	testza.AssertEqual(t, tilbits[1].Text, `**Second TIL:** Content 2`)
 	testza.AssertNil(t, err)
 }
