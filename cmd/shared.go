@@ -32,7 +32,7 @@ func parseFile(file string) (tilbits []core.Tilbit) {
 
 		parts := strings.Split(line, "{")
 		if len(parts) != 2 {
-			errors.New(fmt.Sprintf("Unexpected parse of line with metadata: %s", line))
+			panic(errors.New(fmt.Sprintf("Unexpected parse of line with metadata: %s", line)))
 		}
 
 		text := parts[0]
