@@ -19,13 +19,18 @@ func ParseMetadata(input string) (err error, metadata Metadata) {
 	return
 }
 
-func ParseMarkdown(input string) (err error, tilbits []Tilbit) {
+func ParseMarkdownBody(input string) (err error, tilbits []Tilbit) {
 	texts := strings.Split(input, "\n\n")
 
 	for _, text := range texts {
 		text = strings.Trim(text, " \n")
 		tilbits = append(tilbits, Tilbit{text, TilbitData{}})
 	}
+
+	return
+}
+
+func ParseMarkdownFile(fileContent string) (error, tilbits []Tilbit) {
 
 	return
 }
