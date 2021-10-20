@@ -8,5 +8,11 @@ type Tilbit struct {
 type TilbitData struct {
 	AddedOn string
 	Source  string
+	Url			string
 	Private string
+}
+
+type SourceMetadata struct {
+	Source string
+	Url    string
 }

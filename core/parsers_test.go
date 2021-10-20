@@ -18,8 +18,10 @@ func basicMarkdown() string {
 
 func frontmatter() string {
 	return `
+---
 source: Source title
 url: https://gregpk.com
+---
 `
 }
 
@@ -49,5 +51,24 @@ func TestMarkdownParserBody(t *testing.T) {
 	testza.AssertEqual(t, len(tilbits), 2)
 	testza.AssertEqual(t, tilbits[0].Text, "**First TIL:** Content 1\n* First item\n* Second item")
 	testza.AssertEqual(t, tilbits[1].Text, `**Second TIL:** Content 2`)
+	testza.AssertNil(t, err)
+}
+
+// ---
+func TestMarkdownFileBasic(t *testing.T) {
+	fileContent := frontmatter() + "\n" + basicMarkdown()
+
+	err, tilbits, metadata := ParseMarkdownFile(fileContent)
+
+	testza.AssertEqual(t, metadata.Source, "Source title")
+	testza.AssertEqual(t, metadata.Url, "https://gregpk.com")
+
+	testza.AssertEqual(t, len(tilbits), 2)
+	testza.AssertEqual(t, tilbits[0].Text, "**First TIL:** Content 1\n* First item\n* Second item")
+	testza.AssertEqual(t, tilbits[1].Text, `**Second TIL:** Content 2`)
+	testza.AssertEqual(t, tilbits[0].Data.Source, "Source title")
+	testza.AssertEqual(t, tilbits[1].Data.Source, "Source title")
+	testza.AssertEqual(t, tilbits[0].Data.Url, "https://gregpk.com")
+
 	testza.AssertNil(t, err)
 }
