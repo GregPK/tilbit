@@ -13,9 +13,8 @@ var (
 	rootCmd = &cobra.Command{
 		Use:   "tilbit",
 		Short: "TILBit",
-		Long: `A Fast and Flexible Static Site Generator built with
-						love by spf13 and friends in Go.
-						Complete documentation is available at http://hugo.spf13.com`,
+		Long: `Write down your learnings.
+					 Revise them on each new terminal window.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			tilbits := parseFile(privateDbFilename())
 
@@ -28,6 +27,7 @@ var (
 
 func init() {
 	rootCmd.AddCommand(addCmd)
+	rootCmd.AddCommand(sourcesCmd)
 }
 
 // Execute executes the root command.
