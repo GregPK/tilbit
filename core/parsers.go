@@ -1,6 +1,9 @@
 package core
 
 import (
+	"bufio"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -47,8 +50,6 @@ func ParseMarkdownFile(fileContent string) (err error, tilbits []Tilbit, metadat
 	err, metadata = ParseMetadata(strings.TrimSpace(frontmatter))
 	err, tilbits = ParseMarkdownBody(strings.TrimSpace(body))
 
-	fmt.Printf("FM: [%v]\nBD: [%v]", metadata, tilbits)
-
 	if metadata.Source != "" || metadata.Url != "" {
 		for i, tilbit := range tilbits {
 			if metadata.Source != "" {
@@ -61,5 +62,33 @@ func ParseMarkdownFile(fileContent string) (err error, tilbits []Tilbit, metadat
 		}
 	}
 
+	return
+}
+
+func ParseTextFile(fileContent string) (err error, tilbits []Tilbit) {
+	scanner := bufio.NewScanner(strings.NewReader(fileContent))
+	for scanner.Scan() {
+		line := strings.Trim(scanner.Text(), " ")
+
+		if line == "" {
+			continue
+		}
+
+		parts := strings.Split(line, "{")
+		if len(parts) != 2 {
+			return errors.New(fmt.Sprintf("Unexpected parse of line with metadata: %s", line)), nil
+		}
+
+		text := strings.Trim(parts[0], " ")
+		jsonstr := "{" + parts[1]
+
+		var tilbit Tilbit
+		var metadata TilbitData
+		json.Unmarshal([]byte(jsonstr), &metadata)
+		tilbit.Text = text
+		tilbit.Data = metadata
+
+		tilbits = append(tilbits, tilbit)
+	}
 	return
 }

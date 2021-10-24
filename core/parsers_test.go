@@ -6,6 +6,14 @@ import (
 	"github.com/MarvinJWendt/testza"
 )
 
+func textFile() string {
+	return `
+First tilbit {"addedOn": "2021-04-13", "source": "https://example.com"}
+
+Second tilbit. {"addedOn": "2021-03-29", "url":"https://gregpk.com"}
+`
+}
+
 func basicMarkdown() string {
 	return `
 **First TIL:** Content 1
@@ -71,4 +79,23 @@ func TestMarkdownFileBasic(t *testing.T) {
 	testza.AssertEqual(t, tilbits[0].Data.Url, "https://gregpk.com")
 
 	testza.AssertNil(t, err)
+}
+
+func TestTextFile(t *testing.T) {
+	fileContent := textFile()
+
+	err, tilbits := ParseTextFile(fileContent)
+
+	testza.AssertEqual(t, err, nil)
+
+	testza.AssertEqual(t, len(tilbits), 2)
+
+	testza.AssertEqual(t, tilbits[0].Text, "First tilbit")
+	testza.AssertEqual(t, tilbits[0].Data.Source, "https://example.com")
+	testza.AssertEqual(t, tilbits[0].Data.AddedOn, "2021-04-13")
+
+	testza.AssertEqual(t, tilbits[1].Text, "Second tilbit.")
+	testza.AssertEqual(t, tilbits[1].Data.Source, "")
+	testza.AssertEqual(t, tilbits[1].Data.AddedOn, "2021-03-29")
+	testza.AssertEqual(t, tilbits[1].Data.Url, "https://gregpk.com")
 }
