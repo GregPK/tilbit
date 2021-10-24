@@ -29,7 +29,6 @@ func parseFile(fileString string) (tilbits []core.Tilbit) {
 		data, err := ioutil.ReadFile(fileString)
 		if err != nil {
 			panic(err)
-			return
 		}
 
 		err, tilbits = core.ParseMarkdownBody(string(data))
@@ -70,7 +69,6 @@ func parseTextFile(file string) (tilbits []core.Tilbit) {
 		tilbit.Data = metadata
 
 		tilbits = append(tilbits, tilbit)
-		// fmt.Println(tilbits[0].Text)
 	}
 	return
 }
