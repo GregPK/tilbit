@@ -92,3 +92,31 @@ func ParseTextFile(fileContent string) (err error, tilbits []Tilbit) {
 	}
 	return
 }
+
+func ParseKindleClippingsFile(fileContent string) (err error, tilbits []Tilbit) {
+	items := strings.Split(fileContent, "==========")
+	for _, item := range items {
+		item = strings.Trim(item, " \n")
+		if len(item) == 0 {
+			continue
+		}
+
+		var tilbit Tilbit
+		lines := linesFrom(item)
+		tilbit.Data.Source = strings.Trim(lines[0], " \n")
+		tilbit.Text = strings.Trim(strings.Join(lines[3:], "\n"), " \n")
+
+		tilbits = append(tilbits, tilbit)
+	}
+
+	return
+}
+
+func linesFrom(str string) (result []string) {
+	scanner := bufio.NewScanner(strings.NewReader(str))
+	for scanner.Scan() {
+		line := scanner.Text()
+		result = append(result, line)
+	}
+	return result
+}

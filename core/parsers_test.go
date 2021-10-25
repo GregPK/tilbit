@@ -99,3 +99,36 @@ func TestTextFile(t *testing.T) {
 	testza.AssertEqual(t, tilbits[1].Data.AddedOn, "2021-03-29")
 	testza.AssertEqual(t, tilbits[1].Data.Url, "https://gregpk.com")
 }
+
+func kindleClippingsFile() string {
+	return `
+Source Title (Author1, Name)
+- Your Highlight on page 110 | location 1681-1682 | Added on Sunday, 15 August 2021 14:21:39
+
+Short highlight.
+==========
+Source Title
+- Your Highlight on page 189 | location 2892-2893 | Added on Sunday, 15 August 2021 18:27:59
+
+Longer Tilbit
+Perhaps longer than one line.
+==========
+`
+}
+func TestKindleClippingsFile(t *testing.T) {
+	fileContent := kindleClippingsFile()
+
+	err, tilbits := ParseKindleClippingsFile(fileContent)
+
+	testza.AssertEqual(t, err, nil)
+
+	testza.AssertEqual(t, len(tilbits), 2)
+
+	testza.AssertEqual(t, tilbits[0].Text, "Short highlight.")
+	testza.AssertEqual(t, tilbits[0].Data.Source, "Source Title (Author1, Name)")
+	// testza.AssertEqual(t, tilbits[0].Data.AddedOn, "2021-04-13")
+
+	testza.AssertEqual(t, tilbits[1].Text, "Longer Tilbit\nPerhaps longer than one line.")
+	testza.AssertEqual(t, tilbits[1].Data.Source, "Source Title")
+	// testza.AssertEqual(t, tilbits[1].Data.AddedOn, "2021-03-29")
+}

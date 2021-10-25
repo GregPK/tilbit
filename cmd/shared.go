@@ -28,6 +28,8 @@ func parseFile(fileString string) (tilbits []core.Tilbit) {
 
 	if extension == "md" {
 		err, tilbits = core.ParseMarkdownBody(string(data))
+	} else if strings.Contains(fileString, "My Clippings.txt") {
+		err, tilbits = core.ParseKindleClippingsFile(string(data))
 	} else {
 		err, tilbits = core.ParseTextFile(string(data))
 	}
