@@ -36,3 +36,7 @@ func addTil(content string, source string) {
 		panic(err)
 	}
 }
+
+func privateDbFilename() string {
+	return core.FileRepositoryDir() + "private.txt"
+}

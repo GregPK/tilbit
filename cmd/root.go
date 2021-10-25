@@ -16,7 +16,7 @@ var (
 		Long: `Write down your learnings.
 					 Revise them on each new terminal window.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			tilbits := parseFile(privateDbFilename())
+			tilbits := core.AllTilbits()
 
 			randTil := getRandomBit(tilbits)
 

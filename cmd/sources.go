@@ -1,10 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-	"io/ioutil"
-	"log"
-
+	"github.com/GregPK/tilbit/core"
 	"github.com/spf13/cobra"
 )
 
@@ -22,16 +19,9 @@ var (
 )
 
 func printStats() {
-	files, err := ioutil.ReadDir("data/")
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, file := range files {
-		name := dbDir() + file.Name()
+	sources := core.LoadSources()
 
-		if !file.IsDir() {
-			bits := parseFile(name)
-			fmt.Println(name, len(bits))
-		}
+	for _, source := range sources {
+		println(source.Uri, len(source.Tilbits))
 	}
 }
