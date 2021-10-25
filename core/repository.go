@@ -27,7 +27,7 @@ func AllTilbits() (tilbits []Tilbit) {
 }
 
 func LoadSources() (sources []Source) {
-	files, err := ioutil.ReadDir("data/")
+	files, err := ioutil.ReadDir(FileRepositoryDir())
 	if err != nil {
 		log.Fatal(err)
 	}
