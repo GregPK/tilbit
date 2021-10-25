@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"log"
+	"time"
+
 	"github.com/GregPK/tilbit/core"
 	"github.com/spf13/cobra"
 )
@@ -21,7 +24,10 @@ var (
 func printStats() {
 	sources := core.LoadSources()
 
+	start := time.Now()
+	log.Println("Loading sources from " + core.FileRepositoryDir())
 	for _, source := range sources {
 		println(source.Uri, len(source.Tilbits))
 	}
+	log.Println("Finished, loaded in: ", time.Since(start))
 }
