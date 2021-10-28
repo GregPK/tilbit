@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -89,15 +90,17 @@ func ParseTextFile(fileContent string) (err error, tilbits []Tilbit) {
 func ParseKindleClippingsFile(fileContent string) (err error, tilbits []Tilbit) {
 	items := strings.Split(fileContent, "==========")
 	for _, item := range items {
-		item = strings.Trim(item, " \n")
+		item = strings.Trim(item, " \n\r")
 		if len(item) == 0 {
 			continue
 		}
 
 		var tilbit Tilbit
-		lines := linesFrom(item)
-		tilbit.Data.Source = strings.Trim(lines[0], " \n")
-		tilbit.Text = strings.Trim(strings.Join(lines[3:], "\n"), " \n")
+		lines := linesFrom(item, false)
+		// println(strings.Join(lines, "|"))
+
+		tilbit.Data.Source = strings.Trim(lines[0], " \n\r")
+		tilbit.Text = strings.Trim(strings.Join(lines[3:], "\n"), " \n\r")
 
 		tilbits = append(tilbits, tilbit)
 	}
@@ -105,11 +108,16 @@ func ParseKindleClippingsFile(fileContent string) (err error, tilbits []Tilbit) 
 	return
 }
 
-func linesFrom(str string) (result []string) {
+func linesFrom(str string, numbered bool) (result []string) {
 	scanner := bufio.NewScanner(strings.NewReader(str))
+	ln := 0
 	for scanner.Scan() {
 		line := scanner.Text()
+		if numbered {
+			line = strconv.Itoa(ln) + ":" + line
+		}
 		result = append(result, line)
+		ln += 1
 	}
 	return result
 }

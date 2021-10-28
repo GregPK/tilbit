@@ -104,6 +104,7 @@ func TestTextFile(t *testing.T) {
 
 func kindleClippingsFile() string {
 	return `
+==========
 Source Title (Author1, Name)
 - Your Highlight on page 110 | location 1681-1682 | Added on Sunday, 15 August 2021 14:21:39
 
@@ -114,8 +115,7 @@ Source Title
 
 Longer Tilbit
 Perhaps longer than one line.
-==========
-`
+==========`
 }
 func TestKindleClippingsFile(t *testing.T) {
 	fileContent := kindleClippingsFile()

@@ -17,7 +17,6 @@ func GetBitString(tilbit Tilbit) (str string, err error) {
 	if tilbit.Data.AddedOn != "" {
 		footer += " (" + tilbit.Data.AddedOn + ")"
 	}
-	println(fmt.Sprintf("%s", tilbit.Data))
 
 	str = text + "\n" + footer
 	return
