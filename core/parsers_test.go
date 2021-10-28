@@ -34,7 +34,7 @@ url: https://gregpk.com
 }
 
 func TestMetadataParser(t *testing.T) {
-	err, m := ParseMetadata(frontmatter())
+	err, m := parseMetadata(frontmatter())
 	testza.AssertEqual(t, m.Source, "Source title")
 	testza.AssertEqual(t, m.Url, "https://gregpk.com")
 	testza.AssertNil(t, err)
@@ -47,7 +47,7 @@ func TestMarkdownParserParagraphs(t *testing.T) {
 **Second TIL:** Content 2
 `
 
-	err, tilbits := ParseMarkdownBody(test)
+	err, tilbits := parseMarkdownBody(test)
 	testza.AssertEqual(t, len(tilbits), 2)
 	testza.AssertEqual(t, tilbits[0].Text, `**First TIL:** Content 1`)
 	testza.AssertEqual(t, tilbits[1].Text, `**Second TIL:** Content 2`)
@@ -55,7 +55,7 @@ func TestMarkdownParserParagraphs(t *testing.T) {
 }
 
 func TestMarkdownParserBody(t *testing.T) {
-	err, tilbits := ParseMarkdownBody(basicMarkdown())
+	err, tilbits := parseMarkdownBody(basicMarkdown())
 	testza.AssertEqual(t, len(tilbits), 2)
 	testza.AssertEqual(t, tilbits[0].Text, "**First TIL:** Content 1\n* First item\n* Second item")
 	testza.AssertEqual(t, tilbits[1].Text, `**Second TIL:** Content 2`)

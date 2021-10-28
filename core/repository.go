@@ -57,7 +57,7 @@ func parseFile(fileString string) (tilbits []Tilbit) {
 	}
 
 	if extension == "md" {
-		err, tilbits = ParseMarkdownBody(string(data))
+		err, tilbits, _ = ParseMarkdownFile(string(data))
 	} else if strings.Contains(fileString, "My Clippings.txt") {
 		err, tilbits = ParseKindleClippingsFile(string(data))
 	} else {

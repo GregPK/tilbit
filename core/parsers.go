@@ -14,7 +14,7 @@ const (
 	frontmatterBreak = "---"
 )
 
-func ParseMetadata(input string) (err error, metadata SourceMetadata) {
+func parseMetadata(input string) (err error, metadata SourceMetadata) {
 	metadata = SourceMetadata{}
 
 	input = strings.ReplaceAll(input, frontmatterBreak, "")
@@ -24,7 +24,7 @@ func ParseMetadata(input string) (err error, metadata SourceMetadata) {
 	return
 }
 
-func ParseMarkdownBody(input string) (err error, tilbits []Tilbit) {
+func parseMarkdownBody(input string) (err error, tilbits []Tilbit) {
 	texts := strings.Split(input, "\n\n")
 
 	for _, text := range texts {
@@ -47,8 +47,8 @@ func ParseMarkdownFile(fileContent string) (err error, tilbits []Tilbit, metadat
 		body = parts[0]
 	}
 
-	err, metadata = ParseMetadata(strings.TrimSpace(frontmatter))
-	err, tilbits = ParseMarkdownBody(strings.TrimSpace(body))
+	err, metadata = parseMetadata(strings.TrimSpace(frontmatter))
+	err, tilbits = parseMarkdownBody(strings.TrimSpace(body))
 
 	if metadata.Source != "" || metadata.Url != "" {
 		for i, tilbit := range tilbits {
