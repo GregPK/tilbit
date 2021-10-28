@@ -50,16 +50,9 @@ func ParseMarkdownFile(fileContent string) (err error, tilbits []Tilbit, metadat
 	err, metadata = parseMetadata(strings.TrimSpace(frontmatter))
 	err, tilbits = parseMarkdownBody(strings.TrimSpace(body))
 
-	if metadata.Source != "" || metadata.Url != "" {
-		for i, tilbit := range tilbits {
-			if metadata.Source != "" {
-				tilbit.Data.Source = metadata.Source
-			}
-			if metadata.Url != "" {
-				tilbit.Data.Url = metadata.Url
-			}
-			tilbits[i] = tilbit
-		}
+	for i, tilbit := range tilbits {
+		tilbit.Data = metadata
+		tilbits[i] = tilbit
 	}
 
 	return

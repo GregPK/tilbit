@@ -1,4 +1,5 @@
 ---
+Author: G.S.Bhogal
 source: 40 powerful concepts
 url: https://twitter.com/g_s_bhogal/status/1225561131122597896
 ---

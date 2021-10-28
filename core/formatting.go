@@ -11,11 +11,14 @@ func GetBitString(tilbit Tilbit) (str string, err error) {
 	text := wordwrap.WrapString(tilbit.Text, 120)
 
 	footer := fmt.Sprintf("   -- %s", tilbit.Data.Source)
-	if tilbit.Data.AddedOn != "" {
-		footer += "(" + tilbit.Data.AddedOn + ")"
+	if tilbit.Data.Author != "" {
+		footer += ", " + tilbit.Data.Author
 	}
+	if tilbit.Data.AddedOn != "" {
+		footer += " (" + tilbit.Data.AddedOn + ")"
+	}
+	println(fmt.Sprintf("%s", tilbit.Data))
 
-	// str = fmt.Sprintf("%s\n%s", text, footer)
 	str = text + "\n" + footer
 	return
 }

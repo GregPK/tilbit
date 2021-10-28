@@ -27,6 +27,7 @@ func basicMarkdown() string {
 func frontmatter() string {
 	return `
 ---
+author: Ralph Waldo Emerson
 source: Source title
 url: https://gregpk.com
 ---
@@ -35,6 +36,7 @@ url: https://gregpk.com
 
 func TestMetadataParser(t *testing.T) {
 	err, m := parseMetadata(frontmatter())
+	testza.AssertEqual(t, m.Author, "Ralph Waldo Emerson")
 	testza.AssertEqual(t, m.Source, "Source title")
 	testza.AssertEqual(t, m.Url, "https://gregpk.com")
 	testza.AssertNil(t, err)
