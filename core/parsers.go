@@ -29,7 +29,7 @@ func ParseMarkdownBody(input string) (err error, tilbits []Tilbit) {
 
 	for _, text := range texts {
 		text = strings.Trim(text, " \n")
-		tilbits = append(tilbits, Tilbit{text, TilbitData{}})
+		tilbits = append(tilbits, Tilbit{text, SourceMetadata{}})
 	}
 
 	return
@@ -83,7 +83,7 @@ func ParseTextFile(fileContent string) (err error, tilbits []Tilbit) {
 		jsonstr := "{" + parts[1]
 
 		var tilbit Tilbit
-		var metadata TilbitData
+		var metadata SourceMetadata
 		json.Unmarshal([]byte(jsonstr), &metadata)
 		tilbit.Text = text
 		tilbit.Data = metadata
