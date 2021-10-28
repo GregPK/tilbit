@@ -9,8 +9,14 @@ import (
 
 func GetBitString(tilbit Tilbit) (str string, err error) {
 	text := wordwrap.WrapString(tilbit.Text, 120)
-	footer := fmt.Sprintf("   -- %s (%s)", tilbit.Data.Source, tilbit.Data.AddedOn)
-	str = fmt.Sprintf("%s\n%s", text, footer)
+
+	footer := fmt.Sprintf("   -- %s", tilbit.Data.Source)
+	if tilbit.Data.AddedOn != "" {
+		footer += "(" + tilbit.Data.AddedOn + ")"
+	}
+
+	// str = fmt.Sprintf("%s\n%s", text, footer)
+	str = text + "\n" + footer
 	return
 }
 func MakeTilLine(content string, source string) (tilLine string) {

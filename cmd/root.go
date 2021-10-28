@@ -20,7 +20,8 @@ var (
 
 			randTil := getRandomBit(tilbits)
 
-			fmt.Println(core.GetBitString(randTil))
+			text, _ := core.GetBitString(randTil)
+			fmt.Println(text)
 		},
 	}
 )
