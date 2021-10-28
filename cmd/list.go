@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/GregPK/tilbit/core"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -14,8 +16,14 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			tilbits := core.AllTilbits()
 
-			data, _ := yaml.Marshal(&tilbits)
-			println(string(data))
+			data, err := yaml.Marshal(&tilbits)
+
+			if err != nil {
+				fmt.Printf("err: %v\n", err)
+				return
+			}
+			fmt.Println(string(data))
+			// fmt.Println(fmt.Sprintf("Data lenght: %s", strconv.Itoa(len(string(data)))))
 		},
 	}
 )
