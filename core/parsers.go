@@ -26,17 +26,27 @@ func parseMetadata(input string) (err error, metadata SourceMetadata) {
 }
 
 func parseMarkdownBody(input string) (err error, tilbits []Tilbit) {
-	texts := strings.Split(input, "\n\n")
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	lineNumber := 0
+	lastTilbitText := "" // needed because we're looking for paragraph (two line breaks)
+	for scanner.Scan() {
+		lineNumber += 1
+		text := scanner.Text()
 
-	for _, text := range texts {
-		text = strings.Trim(text, " \n")
-		tilbits = append(tilbits, Tilbit{text, SourceMetadata{}})
+		if len(strings.Trim(text, " \n")) == 0 && len(lastTilbitText) > 0 {
+			tilbitLineLen := strings.Count(lastTilbitText, "\n") + 1
+			tilbits = append(tilbits, Tilbit{strings.Trim(lastTilbitText, "\n"), SourceMetadata{}, SourceLocation{LineNumber: lineNumber - tilbitLineLen}})
+			lastTilbitText = ""
+			continue
+		}
+		lastTilbitText += fmt.Sprintln(text)
 	}
+	tilbits = append(tilbits, Tilbit{strings.Trim(lastTilbitText, "\n"), SourceMetadata{}, SourceLocation{LineNumber: lineNumber}})
 
 	return
 }
 
-func ParseMarkdownFile(fileContent string) (err error, tilbits []Tilbit, metadata SourceMetadata) {
+func ParseMarkdownFile(fileContent string, fileName string) (err error, tilbits []Tilbit, metadata SourceMetadata) {
 	frontmatter := ""
 	body := ""
 
@@ -48,21 +58,28 @@ func ParseMarkdownFile(fileContent string) (err error, tilbits []Tilbit, metadat
 		body = parts[0]
 	}
 
+	frontmatterLines := strings.Count(frontmatter, "\n") + strings.Count(fileContent, frontmatterBreak)
+
 	err, metadata = parseMetadata(strings.TrimSpace(frontmatter))
 	err, tilbits = parseMarkdownBody(strings.TrimSpace(body))
 
 	for i, tilbit := range tilbits {
 		tilbit.Data = metadata
+		tilbit.Location.Uri = fileName
+		tilbit.Location.LineNumber += frontmatterLines
+
 		tilbits[i] = tilbit
 	}
 
 	return
 }
 
-func ParseTextFile(fileContent string) (err error, tilbits []Tilbit) {
+func ParseTextFile(fileContent string, fileName string) (err error, tilbits []Tilbit) {
 	scanner := bufio.NewScanner(strings.NewReader(fileContent))
+	lineNumber := 0
 	for scanner.Scan() {
 		line := strings.Trim(scanner.Text(), " ")
+		lineNumber += 1
 
 		if line == "" {
 			continue
@@ -81,28 +98,34 @@ func ParseTextFile(fileContent string) (err error, tilbits []Tilbit) {
 		json.Unmarshal([]byte(jsonstr), &metadata)
 		tilbit.Text = text
 		tilbit.Data = metadata
+		tilbit.Location.Uri = fileName
+		tilbit.Location.LineNumber = lineNumber
 
 		tilbits = append(tilbits, tilbit)
 	}
 	return
 }
 
-func ParseKindleClippingsFile(fileContent string) (err error, tilbits []Tilbit) {
+func ParseKindleClippingsFile(fileContent string, fileName string) (err error, tilbits []Tilbit) {
 	items := strings.Split(fileContent, "==========")
+	lineNumber := 1
 	for _, item := range items {
 		item = strings.Trim(item, " \n\r")
 		if len(item) == 0 {
+			lineNumber += 1
 			continue
 		}
 
 		var tilbit Tilbit
 		lines := linesFrom(item, false)
-		// println(strings.Join(lines, "|"))
 
 		tilbit.Data.Source = strings.Trim(lines[0], " \n\r")
 		tilbit.Text = strings.Trim(strings.Join(lines[3:], "\n"), " \n\r")
+		tilbit.Location.Uri = fileName
+		tilbit.Location.LineNumber = lineNumber
 
 		tilbits = append(tilbits, tilbit)
+		lineNumber += len(lines) + 1
 	}
 
 	return
