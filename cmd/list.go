@@ -13,8 +13,18 @@ var (
 		Use:   "list",
 		Short: "List TILBits",
 		Long:  `Lists all TILBits from all available sources and outputs all data that is has for a given entry`,
+		Args:  cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			tilbits := core.AllTilbits()
+			tilbits := []core.Tilbit{}
+			if len(args) == 0 {
+				tilbits = core.AllTilbits()
+			} else {
+				tilbit, err := core.ById(args[0])
+				if err != nil {
+					panic(err)
+				}
+				tilbits = []core.Tilbit{tilbit}
+			}
 
 			data, err := yaml.Marshal(&tilbits)
 

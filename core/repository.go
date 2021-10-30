@@ -1,6 +1,8 @@
 package core
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -24,6 +26,17 @@ func AllTilbits() (tilbits []Tilbit) {
 		tilbits = append(tilbits, source.Tilbits...)
 	}
 	return
+}
+
+func ById(hash string) (tilbit Tilbit, err error) {
+	tilbits := AllTilbits()
+
+	for _, tilbit := range tilbits {
+		if strings.Contains(tilbit.Id(), hash) {
+			return tilbit, nil
+		}
+	}
+	return Tilbit{}, errors.New(fmt.Sprintf("Tilbit for id=[%s] not found", hash))
 }
 
 func LoadSources() (sources []Source) {
