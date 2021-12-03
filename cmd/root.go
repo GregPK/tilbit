@@ -30,6 +30,7 @@ func init() {
 	rootCmd.AddCommand(addCmd)
 	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(sourcesCmd)
+	rootCmd.AddCommand(showCmd)
 }
 
 // Execute executes the root command.
