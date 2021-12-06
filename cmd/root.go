@@ -20,7 +20,7 @@ var (
 
 			randTil := getRandomBit(tilbits)
 
-			text, _ := core.GetBitString(randTil)
+			text, _ := core.GetBitString(randTil, true)
 			fmt.Println(text)
 		},
 	}
@@ -40,7 +40,6 @@ func Execute() error {
 
 func getRandomBit(tilbits []core.Tilbit) (randomTilbit core.Tilbit) {
 	rand.Seed(time.Now().UnixNano())
-	// fmt.Printf("%s:\n", len(tilbits))
 	randomTilbit = tilbits[rand.Intn(len(tilbits))]
 	return
 }

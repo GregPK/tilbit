@@ -28,7 +28,7 @@ var (
 			}
 
 			for _, tilbit := range tilbits {
-				text, _ := core.GetBitString(tilbit)
+				text, _ := core.GetBitString(tilbit, true)
 				fmt.Println(text)
 			}
 		},

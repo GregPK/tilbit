@@ -4,15 +4,54 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
+	"math"
+	"math/rand"
+	"os"
 	"time"
 
+	"github.com/Delta456/box-cli-maker/v2"
 	"github.com/mitchellh/go-wordwrap"
+	"golang.org/x/term"
 )
 
-func GetBitString(tilbit Tilbit) (str string, err error) {
-	text := wordwrap.WrapString(tilbit.Text, 120)
+func GetBitString(tilbit Tilbit, box bool) (str string, err error) {
+	box = true
 
-	footer := fmt.Sprintf("   -- %s", tilbit.Data.Source)
+	if box {
+		str = printBox(tilbit)
+	} else {
+		text, footer := printString(tilbit)
+		str = text + "\n" + footer
+	}
+
+	return
+}
+
+func printBox(tilbit Tilbit) (str string) {
+	str = ""
+	Box := box.New(box.Config{Px: 1, Py: 0, Type: "Single", Color: randomColor(), TitlePos: "Top"})
+	text, footer := printString(tilbit)
+	Box.Print(footer, text)
+	return
+}
+
+func randomColor() string {
+	rand.Seed(time.Now().UnixNano())
+	colors := []string{"Black", "Blue", "Red", "Green", "Yellow", "Cyan", "Magenta", "White"}
+	randomIndex := rand.Intn(len(colors))
+	color := colors[randomIndex]
+	if rand.Intn(2) == 1 || true {
+		color = "Hi" + color
+	}
+	return color
+}
+
+func printString(tilbit Tilbit) (text string, footer string) {
+	termSize, _, _ := term.GetSize(int(os.Stdin.Fd()))
+	textWrap := uint(math.Min(float64(120), float64(termSize)-10))
+	text = wordwrap.WrapString(tilbit.Text, textWrap)
+
+	footer = fmt.Sprintf("   -- %s", tilbit.Data.Source)
 	if tilbit.Data.Author != "" {
 		footer += ", " + tilbit.Data.Author
 	}
@@ -21,9 +60,9 @@ func GetBitString(tilbit Tilbit) (str string, err error) {
 	}
 	footer += " (id: " + tilbit.Id()[:8] + ")"
 
-	str = text + "\n" + footer
 	return
 }
+
 func MakeTilLine(content string, source string) (tilLine string) {
 	addedOn := isoDate(time.Now())
 
