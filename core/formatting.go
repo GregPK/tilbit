@@ -20,7 +20,7 @@ func GetBitString(tilbit Tilbit, box bool) (str string, err error) {
 	if box {
 		str = printBox(tilbit)
 	} else {
-		text, footer := printString(tilbit)
+		text, footer, _ := printString(tilbit)
 		str = text + "\n" + footer
 	}
 
@@ -30,8 +30,14 @@ func GetBitString(tilbit Tilbit, box bool) (str string, err error) {
 func printBox(tilbit Tilbit) (str string) {
 	str = ""
 	Box := box.New(box.Config{Px: 1, Py: 0, Type: "Single", Color: randomColor(), TitlePos: "Top"})
-	text, footer := printString(tilbit)
-	Box.Print(footer, text)
+	text, footer, wrapWidth := printString(tilbit)
+
+	if len(footer) > int(wrapWidth)+5 {
+		Box.Print(footer, text)
+	} else {
+		Box.Print("", text+"\n"+"  "+footer)
+	}
+
 	return
 }
 
@@ -46,10 +52,10 @@ func randomColor() string {
 	return color
 }
 
-func printString(tilbit Tilbit) (text string, footer string) {
+func printString(tilbit Tilbit) (text string, footer string, wrapWidth uint) {
 	termSize, _, _ := term.GetSize(int(os.Stdin.Fd()))
-	textWrap := uint(math.Min(float64(120), float64(termSize)-10))
-	text = wordwrap.WrapString(tilbit.Text, textWrap)
+	wrapWidth = uint(math.Min(float64(120), float64(termSize)-10))
+	text = wordwrap.WrapString(tilbit.Text, wrapWidth)
 
 	footer = fmt.Sprintf("   -- %s", tilbit.Data.Source)
 	if tilbit.Data.Author != "" {
