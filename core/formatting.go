@@ -32,10 +32,11 @@ func printBox(tilbit Tilbit) (str string) {
 	Box := box.New(box.Config{Px: 1, Py: 0, Type: "Single", Color: randomColor(), TitlePos: "Top"})
 	text, footer, wrapWidth := printString(tilbit)
 
-	if len(footer) > int(wrapWidth)+5 {
+	if len(footer) < int(wrapWidth) {
 		Box.Print(footer, text)
 	} else {
-		Box.Print("", text+"\n"+"  "+footer)
+		text := text + "\n" + "  " + wordwrap.WrapString(footer, wrapWidth-5)
+		Box.Print("", text)
 	}
 
 	return
