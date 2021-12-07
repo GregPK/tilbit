@@ -29,14 +29,36 @@ func AllTilbits() (tilbits []Tilbit) {
 }
 
 func ById(hash string) (tilbit Tilbit, err error) {
+	tilbits, err := ByIds([]string{hash})
+	if len(tilbits) > 0 {
+		tilbit = tilbits[0]
+	}
+
+	return
+}
+
+func ByIds(hashes []string) (foundBits []Tilbit, err error) {
 	tilbits := AllTilbits()
 
-	for _, tilbit := range tilbits {
-		if strings.Contains(tilbit.Id(), hash) {
-			return tilbit, nil
+	foundMap := map[string]Tilbit{}
+
+	for _, hash := range hashes {
+		for _, tilbit := range tilbits {
+			if strings.Contains(tilbit.Id(), hash) {
+				foundMap[hash] = tilbit
+				break
+			}
+		}
+		_, found := foundMap[hash]
+		if !found {
+			return []Tilbit{}, errors.New(fmt.Sprintf("Tilbit for id=[%s] not found", hash))
 		}
 	}
-	return Tilbit{}, errors.New(fmt.Sprintf("Tilbit for id=[%s] not found", hash))
+	for _, item := range foundMap {
+		foundBits = append(foundBits, item)
+	}
+
+	return foundBits, nil
 }
 
 func LoadSources() (sources []Source) {
