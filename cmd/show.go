@@ -12,7 +12,7 @@ var (
 		Use:   "show",
 		Short: "Show specific TILBit",
 		Long:  `Shows a specific TILBit when given ID, shows randon otherwise`,
-		Args:  cobra.MaximumNArgs(1),
+		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			tilbits := []core.Tilbit{}
 			if len(args) == 0 {
@@ -20,11 +20,13 @@ var (
 				randTil := getRandomBit(allTilbits)
 				tilbits = append(tilbits, randTil)
 			} else {
-				tilbit, err := core.ById(args[0])
+				ids := core.ParseIdsFromString(args[0])
+
+				var err error
+				tilbits, err = core.ByIds(ids)
 				if err != nil {
 					panic(err)
 				}
-				tilbits = []core.Tilbit{tilbit}
 			}
 
 			for _, tilbit := range tilbits {

@@ -140,3 +140,11 @@ func TestKindleClippingsFile(t *testing.T) {
 	testza.AssertEqual(t, tilbits[1].Location.LineNumber, 7)
 	// testza.AssertEqual(t, tilbits[1].Data.AddedOn, "2021-03-29")
 }
+
+func TestParseIdsFromString(t *testing.T) {
+	testza.AssertContains(t, ParseIdsFromString("1a2b3c"), "1a2b3c")
+	testza.AssertContains(t, ParseIdsFromString("1a2b3c 4d5e6f"), "1a2b3c", "4d5e6f")
+	testza.AssertContains(t, ParseIdsFromString("1a2b3c,4d5e6f"), "1a2b3c", "4d5e6f")
+	testza.AssertContains(t, ParseIdsFromString("1a2b3c|4d5e6f"), "1a2b3c", "4d5e6f")
+	testza.AssertContains(t, ParseIdsFromString("[1a2b3c,4d5e6f]"), "1a2b3c", "4d5e6f")
+}

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -22,6 +23,14 @@ func parseMetadata(input string) (err error, metadata SourceMetadata) {
 	input = strings.Trim(input, "\n ")
 	err = yaml.Unmarshal([]byte(input), &metadata)
 
+	return
+}
+
+func ParseIdsFromString(idString string) (ids []string) {
+	re := regexp.MustCompile("\\W+")
+	for _, id := range re.Split(idString, -1) {
+		ids = append(ids, id)
+	}
 	return
 }
 
