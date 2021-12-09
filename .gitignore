@@ -6,6 +6,9 @@ tilbit
 *.so
 *.dylib
 
+# release binaries, for upload to github only
+dist/
+
 # Test binary, built with `go test -c`
 *.test
 
