@@ -23,6 +23,7 @@ var (
 			text, _ := core.GetBitString(randTil, true)
 			fmt.Println(text)
 		},
+		Version: core.VERSION,
 	}
 )
 
@@ -31,6 +32,7 @@ func init() {
 	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(sourcesCmd)
 	rootCmd.AddCommand(showCmd)
+	rootCmd.SetVersionTemplate("TILBit version: {{.Version}}\n")
 }
 
 // Execute executes the root command.
