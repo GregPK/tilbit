@@ -7,6 +7,7 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/Delta456/box-cli-maker/v2"
@@ -18,25 +19,75 @@ func GetBitString(tilbit Tilbit, box bool) (str string, err error) {
 	box = true
 
 	if box {
-		str = printBox(tilbit)
+		printBox(tilbit)
 	} else {
-		text, footer, _ := printString(tilbit)
-		str = text + "\n" + footer
+		printString(tilbit)
 	}
 
 	return
 }
 
-func printBox(tilbit Tilbit) (str string) {
-	str = ""
-	Box := box.New(box.Config{Px: 1, Py: 0, Type: "Single", Color: randomColor(), TitlePos: "Top"})
-	text, footer, wrapWidth := printString(tilbit)
+func printBox(tilbit Tilbit) {
+	text, wrapWidth := wrapText(tilbit.Text)
+	footerId := printFooter(tilbit, true, false)
+	footer := printFooter(tilbit, false, false)
+	const boxMargin = 10
 
-	if len(footer) < int(wrapWidth) {
+	Box := box.New(box.Config{Px: 1, Py: 0, Type: "Single", Color: randomColor(), TitlePos: "Top"})
+
+	if len(footerId) < int(wrapWidth)-boxMargin {
+		Box.Print(footerId, text)
+	} else if len(footer) < int(wrapWidth)-boxMargin {
 		Box.Print(footer, text)
 	} else {
-		text := text + "\n" + "  " + wordwrap.WrapString(footer, wrapWidth-5)
-		Box.Print("", text)
+		wrappedFooter, _ := wrapText(footer)
+		Box.Print(tilbit.Id(), text+"\n"+wrappedFooter)
+	}
+
+	return
+}
+
+func printString(tilbit Tilbit) {
+	text := tilbit.Text + "\n" + printFooter(tilbit, true, true)
+	text, _ = wrapText(text)
+
+	fmt.Print(text)
+
+	return
+}
+
+// Wraps and pads the body text based on the terminal size
+// Returns the result text and the wrapped size
+func wrapText(text string) (wrapped string, wrapWidth uint) {
+	termSize, _, _ := term.GetSize(int(os.Stdin.Fd()))
+	wrapWidth = uint(math.Min(float64(120), float64(termSize)-10))
+
+	if len(text) > int(wrapWidth) {
+		wrapped = wordwrap.WrapString(text, wrapWidth)
+	} else {
+		paddingLen := int(wrapWidth) - len(text) - 1
+		wrapped = text + strings.Repeat(" ", paddingLen)
+	}
+
+	return
+}
+
+func printFooter(tilbit Tilbit, appendId bool, indent bool) (footer string) {
+	if indent {
+		footer += "   -- "
+	}
+
+	if tilbit.Data.Author != "" {
+		footer += tilbit.Data.Author
+	}
+	if tilbit.Data.Source != "" {
+		footer += " - " + tilbit.Data.Source
+	}
+	if tilbit.Data.AddedOn != "" {
+		footer += " (" + tilbit.Data.AddedOn + ")"
+	}
+	if appendId {
+		footer += " (id: " + tilbit.Id()[:8] + ")"
 	}
 
 	return
@@ -51,23 +102,6 @@ func randomColor() string {
 		color = "Hi" + color
 	}
 	return color
-}
-
-func printString(tilbit Tilbit) (text string, footer string, wrapWidth uint) {
-	termSize, _, _ := term.GetSize(int(os.Stdin.Fd()))
-	wrapWidth = uint(math.Min(float64(120), float64(termSize)-10))
-	text = wordwrap.WrapString(tilbit.Text, wrapWidth)
-
-	footer = fmt.Sprintf("   -- %s", tilbit.Data.Source)
-	if tilbit.Data.Author != "" {
-		footer += ", " + tilbit.Data.Author
-	}
-	if tilbit.Data.AddedOn != "" {
-		footer += " (" + tilbit.Data.AddedOn + ")"
-	}
-	footer += " (id: " + tilbit.Id()[:8] + ")"
-
-	return
 }
 
 func MakeTilLine(content string, source string) (tilLine string) {
