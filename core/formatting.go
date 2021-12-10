@@ -12,6 +12,7 @@ import (
 
 	"github.com/Delta456/box-cli-maker/v2"
 	"github.com/eidolon/wordwrap"
+	"github.com/mattn/go-runewidth"
 	"golang.org/x/term"
 )
 
@@ -48,11 +49,26 @@ func printBox(tilbit Tilbit) {
 		body = fmt.Sprintf("%s\n%s", text, wrappedFooter)
 	}
 	// Edge case: When title is longer than body pad the body
-	if len(title) > len(body) {
-		paddingLen := len(title) - len(body) + 8
-		body += strings.Repeat(" ", paddingLen)
+	if runewidth.StringWidth(title) > runewidth.StringWidth(text) {
+		paddingLen := runewidth.StringWidth(title) - runewidth.StringWidth(text) + 8
+		if paddingLen > 0 {
+			// Another edge case, when there is a newline and ID that pads the body, but the width stays too small
+			if strings.Contains(body, "\n") {
+				body = strings.Replace(body, "\n", strings.Repeat(" ", paddingLen)+"\n", 1)
+			} else {
+				body += strings.Repeat(" ", paddingLen)
+			}
+		}
 	}
-
+	// The Box library sometimes panics, we want to be able to recover from that and show the culprit.
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Recovering from panic for id:", tilbit.Id(), r)
+			fmt.Println("[", title, "]")
+			fmt.Println("[", body, "]")
+			fmt.Println("[", text, "]")
+		}
+	}()
 	Box.Print(title, body)
 
 	return
