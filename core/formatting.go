@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/Delta456/box-cli-maker/v2"
-	"github.com/mitchellh/go-wordwrap"
+	"github.com/eidolon/wordwrap"
 	"golang.org/x/term"
 )
 
@@ -31,14 +31,15 @@ func printBox(tilbit Tilbit) {
 	text, wrapWidth := wrapText(tilbit.Text)
 	footerId := printFooter(tilbit, true, false)
 	footer := printFooter(tilbit, false, false)
-	const boxMargin = 10
+	const boxMargin = 5
 
 	Box := box.New(box.Config{Px: 1, Py: 0, Type: "Single", Color: randomColor(), TitlePos: "Top"})
 
 	if len(footerId) < int(wrapWidth)-boxMargin {
 		Box.Print(footerId, text)
 	} else if len(footer) < int(wrapWidth)-boxMargin {
-		Box.Print(footer, text)
+		boxContent := fmt.Sprintf("%s\n(#%s)", text, tilbit.Id())
+		Box.Print(footer, boxContent)
 	} else {
 		wrappedFooter, _ := wrapText(footer)
 		Box.Print(tilbit.Id(), text+"\n"+wrappedFooter)
@@ -62,11 +63,15 @@ func wrapText(text string) (wrapped string, wrapWidth uint) {
 	termSize, _, _ := term.GetSize(int(os.Stdin.Fd()))
 	wrapWidth = uint(math.Min(float64(120), float64(termSize)-10))
 
-	if len(text) > int(wrapWidth) {
-		wrapped = wordwrap.WrapString(text, wrapWidth)
+	if len(text) >= int(wrapWidth) {
+		wrapper := wordwrap.Wrapper(int(wrapWidth), true)
+		wrapped = wrapper(text)
 	} else {
-		paddingLen := int(wrapWidth) - len(text) - 1
-		wrapped = text + strings.Repeat(" ", paddingLen)
+		paddingLen := int(wrapWidth) - len(text)
+		if paddingLen > 0 {
+			//panic(fmt.Sprintf("Bad padding for [%d,%d] text: [%s]", len(text), int(wrapWidth), text))
+			wrapped = text + strings.Repeat(" ", paddingLen)
+		}
 	}
 
 	return
