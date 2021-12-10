@@ -15,10 +15,9 @@ var (
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			tilbits := []core.Tilbit{}
-			if len(args) == 0 {
+			if args[0] == "all" {
 				allTilbits := core.AllTilbits()
-				randTil := getRandomBit(allTilbits)
-				tilbits = append(tilbits, randTil)
+				tilbits = append(tilbits, allTilbits...)
 			} else {
 				ids := core.ParseIdsFromString(args[0])
 
