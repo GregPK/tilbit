@@ -87,7 +87,7 @@ func printFooter(tilbit Tilbit, appendId bool, indent bool) (footer string) {
 		footer += " (" + tilbit.Data.AddedOn + ")"
 	}
 	if appendId {
-		footer += " (id: " + tilbit.Id()[:8] + ")"
+		footer += " (id: " + tilbit.Id() + ")"
 	}
 
 	return
@@ -112,6 +112,10 @@ func MakeTilLine(content string, source string) (tilLine string) {
 }
 
 func (t Tilbit) Id() string {
+	return t.Hash()[:8]
+}
+
+func (t Tilbit) Hash() string {
 	h := md5.New()
 	io.WriteString(h, t.Text)
 	return fmt.Sprintf("%x", h.Sum(nil))
