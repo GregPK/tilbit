@@ -35,15 +35,25 @@ func printBox(tilbit Tilbit) {
 
 	Box := box.New(box.Config{Px: 1, Py: 0, Type: "Single", Color: randomColor(), TitlePos: "Top"})
 
+	var title, body string
+
 	if len(footerId) < int(wrapWidth)-boxMargin {
-		Box.Print(footerId, text)
+		title, body = footerId, text
 	} else if len(footer) < int(wrapWidth)-boxMargin {
-		boxContent := fmt.Sprintf("%s\n(#%s)", text, tilbit.Id())
-		Box.Print(footer, boxContent)
+		title = footer
+		body = fmt.Sprintf("%s\n(#%s)", text, tilbit.Id())
 	} else {
+		title = tilbit.Id()
 		wrappedFooter, _ := wrapText(footer)
-		Box.Print(tilbit.Id(), text+"\n"+wrappedFooter)
+		body = fmt.Sprintf("%s\n%s", text, wrappedFooter)
 	}
+	// Edge case: When title is longer than body pad the body
+	if len(title) > len(body) {
+		paddingLen := len(title) - len(body) + 8
+		body += strings.Repeat(" ", paddingLen)
+	}
+
+	Box.Print(title, body)
 
 	return
 }
@@ -67,11 +77,7 @@ func wrapText(text string) (wrapped string, wrapWidth uint) {
 		wrapper := wordwrap.Wrapper(int(wrapWidth), true)
 		wrapped = wrapper(text)
 	} else {
-		paddingLen := int(wrapWidth) - len(text)
-		if paddingLen > 0 {
-			//panic(fmt.Sprintf("Bad padding for [%d,%d] text: [%s]", len(text), int(wrapWidth), text))
-			wrapped = text + strings.Repeat(" ", paddingLen)
-		}
+		wrapped = text
 	}
 
 	return
