@@ -1,13 +1,15 @@
 package cmd
 
 import (
-	"fmt"
-	"math/rand"
-	"time"
-
 	"github.com/GregPK/tilbit/core"
 	"github.com/spf13/cobra"
 )
+
+type Configuration struct {
+	outputFormat string
+}
+
+var Config = Configuration{"box"}
 
 var (
 	rootCmd = &cobra.Command{
@@ -16,12 +18,10 @@ var (
 		Long: `Write down your learnings.
 					 Revise them on each new terminal window.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			tilbits := core.AllTilbits()
-
-			randTil := getRandomBit(tilbits)
-
-			text, _ := core.GetBitString(randTil, true)
-			fmt.Println(text)
+			if len(args) == 0 {
+				args = append(args, "random")
+			}
+			showCmd.Run(cmd, args)
 		},
 		Version: core.VERSION,
 	}
@@ -33,15 +33,14 @@ func init() {
 	rootCmd.AddCommand(sourcesCmd)
 	rootCmd.AddCommand(showCmd)
 	rootCmd.SetVersionTemplate("TILBit version: {{.Version}}\n")
+	addFlags()
+}
+
+func addFlags() {
+	showCmd.Flags().StringVarP(&Config.outputFormat, "output-format", "f", "box", "Output format for show command")
 }
 
 // Execute executes the root command.
 func Execute() error {
 	return rootCmd.Execute()
-}
-
-func getRandomBit(tilbits []core.Tilbit) (randomTilbit core.Tilbit) {
-	rand.Seed(time.Now().UnixNano())
-	randomTilbit = tilbits[rand.Intn(len(tilbits))]
-	return
 }

@@ -17,8 +17,6 @@ import (
 )
 
 func GetBitString(tilbit Tilbit, box bool) (str string, err error) {
-	box = true
-
 	if box {
 		printBox(tilbit)
 	} else {
