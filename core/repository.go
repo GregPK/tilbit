@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
 type Source struct {
@@ -28,8 +30,28 @@ func AllTilbits() (tilbits []Tilbit) {
 	return
 }
 
-func ById(hash string) (tilbit Tilbit, err error) {
-	tilbits, err := ByIds([]string{hash})
+func ByQuery(query string, inputTilbits []Tilbit) (tilbits []Tilbit, err error) {
+	if len(inputTilbits) == 0 {
+		inputTilbits = AllTilbits()
+	}
+
+	if query == "all" {
+		tilbits = inputTilbits
+	} else if query == "random" {
+		randTil := getRandomBit(inputTilbits)
+		tilbits = append(tilbits, randTil)
+	} else {
+		ids := ParseIdsFromString(query)
+
+		var err error
+		tilbits, err = ByIds(ids, inputTilbits)
+		return tilbits, err
+	}
+	return
+}
+
+func ById(hash string, inputTilbits []Tilbit) (tilbit Tilbit, err error) {
+	tilbits, err := ByIds([]string{hash}, inputTilbits)
 	if len(tilbits) > 0 {
 		tilbit = tilbits[0]
 	}
@@ -37,13 +59,11 @@ func ById(hash string) (tilbit Tilbit, err error) {
 	return
 }
 
-func ByIds(hashes []string) (foundBits []Tilbit, err error) {
-	tilbits := AllTilbits()
-
+func ByIds(hashes []string, inputTilbits []Tilbit) (foundBits []Tilbit, err error) {
 	foundMap := map[string]Tilbit{}
 
 	for _, hash := range hashes {
-		for _, tilbit := range tilbits {
+		for _, tilbit := range inputTilbits {
 			if strings.Contains(tilbit.Id(), hash) {
 				foundMap[hash] = tilbit
 				break
@@ -79,6 +99,12 @@ func LoadSources() (sources []Source) {
 			sources = append(sources, source)
 		}
 	}
+	return
+}
+
+func getRandomBit(tilbits []Tilbit) (randomTilbit Tilbit) {
+	rand.Seed(time.Now().UnixNano())
+	randomTilbit = tilbits[rand.Intn(len(tilbits))]
 	return
 }
 

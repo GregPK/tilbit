@@ -19,7 +19,7 @@ var (
 			if len(args) == 0 {
 				tilbits = core.AllTilbits()
 			} else {
-				tilbit, err := core.ById(args[0])
+				tilbit, err := core.ById(args[0], core.AllTilbits())
 				if err != nil {
 					panic(err)
 				}
