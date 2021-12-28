@@ -12,6 +12,7 @@ type Configuration struct {
 var Config = Configuration{"box"}
 
 var (
+	showCmd = ShowCmd()
 	rootCmd = &cobra.Command{
 		Use:   "tilbit",
 		Short: "TILBit",

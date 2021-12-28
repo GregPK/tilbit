@@ -20,7 +20,7 @@ func GetBitString(tilbit Tilbit, box bool) (str string, err error) {
 	if box {
 		printBox(tilbit)
 	} else {
-		printString(tilbit)
+		str = printString(tilbit)
 	}
 
 	return
@@ -72,20 +72,23 @@ func printBox(tilbit Tilbit) {
 	return
 }
 
-func printString(tilbit Tilbit) {
-	text := tilbit.Text + "\n" + printFooter(tilbit, true, true)
+func printString(tilbit Tilbit) (text string) {
+	text = tilbit.Text + "\n" + printFooter(tilbit, true, true)
 	text, _ = wrapText(text)
-
-	fmt.Print(text)
 
 	return
 }
+
+var defTermSize = 120
 
 // Wraps and pads the body text based on the terminal size
 // Returns the result text and the wrapped size
 func wrapText(text string) (wrapped string, wrapWidth uint) {
 	termSize, _, _ := term.GetSize(int(os.Stdin.Fd()))
-	wrapWidth = uint(math.Min(float64(120), float64(termSize)-10))
+	if termSize < 1 { // probably running headless
+		termSize = defTermSize
+	}
+	wrapWidth = uint(math.Min(float64(defTermSize), float64(termSize)-10))
 
 	if len(text) >= int(wrapWidth) {
 		wrapper := wordwrap.Wrapper(int(wrapWidth), true)
