@@ -8,7 +8,7 @@ import (
 )
 
 func ShowCmd(inputTilbits ...core.Tilbit) *cobra.Command {
-	return &cobra.Command{
+	cmd := cobra.Command{
 		Use:   "show",
 		Short: "Show specific TILBit",
 		Long:  `Shows a specific TILBit when given ID, shows randon otherwise`,
@@ -18,11 +18,14 @@ func ShowCmd(inputTilbits ...core.Tilbit) *cobra.Command {
 			if err != nil {
 				panic(err)
 			}
-
 			for _, tilbit := range tilbits {
-				text, _ := core.GetBitString(tilbit, Config.outputFormat == "box")
+				text, _ := core.GetBitString(tilbit, Config.outputFormat)
 				fmt.Fprintf(cmd.OutOrStdout(), text)
 			}
 		},
 	}
+	if Config.outputFormat == "box" {
+		cmd.Flags().StringVarP(&Config.outputFormat, "output-format", "f", "box", "Output format for show command")
+	}
+	return &cmd
 }

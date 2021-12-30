@@ -12,7 +12,7 @@ type Configuration struct {
 var Config = Configuration{"box"}
 
 func RootCmd(inputTilbits ...core.Tilbit) *cobra.Command {
-	return &cobra.Command{
+	rcmd := cobra.Command{
 		Use:   "tilbit",
 		Short: "TILBit",
 		Long: `Write down your learnings.
@@ -26,6 +26,7 @@ func RootCmd(inputTilbits ...core.Tilbit) *cobra.Command {
 		},
 		Version: core.VERSION,
 	}
+	return &rcmd
 }
 
 var (
@@ -35,15 +36,10 @@ var (
 
 func init() {
 	rootCmd.AddCommand(addCmd)
-	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(sourcesCmd)
 	rootCmd.AddCommand(showCmd)
 	rootCmd.SetVersionTemplate("TILBit version: {{.Version}}\n")
-	addFlags()
-}
-
-func addFlags() {
-	showCmd.Flags().StringVarP(&Config.outputFormat, "output-format", "f", "box", "Output format for show command")
+	rootCmd.Flags().StringVarP(&Config.outputFormat, "output-format", "f", "box", "Output format for show command")
 }
 
 // Execute executes the root command.

@@ -14,11 +14,14 @@ import (
 	"github.com/eidolon/wordwrap"
 	"github.com/mattn/go-runewidth"
 	"golang.org/x/term"
+	"gopkg.in/yaml.v2"
 )
 
-func GetBitString(tilbit Tilbit, box bool) (str string, err error) {
-	if box {
+func GetBitString(tilbit Tilbit, format string) (str string, err error) {
+	if format == "box" {
 		printBox(tilbit)
+	} else if format == "yaml" {
+		str = printYaml(tilbit)
 	} else {
 		str = printString(tilbit)
 	}
@@ -76,6 +79,16 @@ func printString(tilbit Tilbit) (text string) {
 	text = tilbit.Text + "\n" + printFooter(tilbit, true, true)
 	text, _ = wrapText(text)
 
+	return
+}
+
+func printYaml(tilbit Tilbit) (text string) {
+	data, e := yaml.Marshal(&tilbit)
+	if e != nil {
+		text = ""
+	} else {
+		text = string(data)
+	}
 	return
 }
 
