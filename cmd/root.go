@@ -11,14 +11,14 @@ type Configuration struct {
 
 var Config = Configuration{"box"}
 
-var (
-	showCmd = ShowCmd()
-	rootCmd = &cobra.Command{
+func RootCmd(inputTilbits ...core.Tilbit) *cobra.Command {
+	return &cobra.Command{
 		Use:   "tilbit",
 		Short: "TILBit",
 		Long: `Write down your learnings.
 					 Revise them on each new terminal window.`,
 		Run: func(cmd *cobra.Command, args []string) {
+			showCmd := ShowCmd(inputTilbits...)
 			if len(args) == 0 {
 				args = append(args, "random")
 			}
@@ -26,6 +26,11 @@ var (
 		},
 		Version: core.VERSION,
 	}
+}
+
+var (
+	showCmd = ShowCmd()
+	rootCmd = RootCmd()
 )
 
 func init() {

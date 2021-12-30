@@ -14,14 +14,25 @@ var inputTilbits []core.Tilbit
 func TestShowCommand(t *testing.T) {
 	b := bytes.NewBufferString("")
 	Config.outputFormat = "text"
-	showCmd = ShowCmd(core.Tilbit{Text: "Tilbit text"})
-	showCmd.SetOut(b)
-	showCmd.SetArgs([]string{"random"})
-	showCmd.Execute()
+	cmd := ShowCmd(core.Tilbit{Text: "Tilbit text"})
+	cmd.SetOut(b)
+	cmd.SetArgs([]string{"random"})
+	cmd.Execute()
 
 	out, err := ioutil.ReadAll(b)
 	testza.AssertNoError(t, err)
 	testza.AssertEqual(t, "Tilbit text\n   --  (id: 1ff954c5)", string(out))
+}
 
-	testza.AssertEqual(t, 1, 1) // -> Pass
+func TestRootCommand(t *testing.T) {
+	b := bytes.NewBufferString("")
+	Config.outputFormat = "text"
+	cmd := RootCmd(core.Tilbit{Text: "Tilbit text"})
+	cmd.SetOut(b)
+	cmd.SetArgs([]string{"random"})
+	cmd.Execute()
+
+	out, err := ioutil.ReadAll(b)
+	testza.AssertNoError(t, err)
+	testza.AssertEqual(t, "Tilbit text\n   --  (id: 1ff954c5)", string(out))
 }
