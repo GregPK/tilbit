@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var showCmd = ShowCmd()
+
 func ShowCmd(inputTilbits ...core.Tilbit) *cobra.Command {
 	cmd := cobra.Command{
 		Use:   "show",
@@ -24,8 +26,6 @@ func ShowCmd(inputTilbits ...core.Tilbit) *cobra.Command {
 			}
 		},
 	}
-	if Config.outputFormat == "box" {
-		cmd.Flags().StringVarP(&Config.outputFormat, "output-format", "f", "box", "Output format for show command")
-	}
+	cmd.Flags().StringVarP(&Config.outputFormat, "output-format", "f", "box", "Output format for show command")
 	return &cmd
 }

@@ -29,17 +29,14 @@ func RootCmd(inputTilbits ...core.Tilbit) *cobra.Command {
 	return &rcmd
 }
 
-var (
-	showCmd = ShowCmd()
-	rootCmd = RootCmd()
-)
+var rootCmd = RootCmd()
 
 func init() {
 	rootCmd.AddCommand(addCmd)
 	rootCmd.AddCommand(sourcesCmd)
 	rootCmd.AddCommand(showCmd)
 	rootCmd.SetVersionTemplate("TILBit version: {{.Version}}\n")
-	rootCmd.Flags().StringVarP(&Config.outputFormat, "output-format", "f", "box", "Output format for show command")
+	rootCmd.PersistentFlags().StringVarP(&Config.outputFormat, "output-format", "f", "box", "Output format for show command")
 }
 
 // Execute executes the root command.
