@@ -23,7 +23,7 @@ Retain the information you consume. Think deeply about things you learn.
 - A negative result is a result. If you haven't learned anything worthwhile, think about how you got to that particular item. What made you want to read it? How did it draw you in.
 
 
-## Temporary database migration plan to be removed.
+## Temporary database migration plan - to be removed.
 
 I want to transition the tool to have a permanent local database of items. This is general has a lot of strong points, mostly relating to how data can be queried without re-inventing the wheel.
 
@@ -31,7 +31,8 @@ The only downside is that some items, like kindle clippings, will have to be imp
 
 I want to do this in a very non-breaking and small steps approach so the tentative plan is to:
 - keep the source approach for now
-- implement and test the db handlers and all the db as a new source
+- refactor the current sources into a new repository struct
+- implement and test the db handlers and all the db as a new alternative repository
 - implement importers that will wrap current parsers
 - the db will be an in-memory database for the time being that runs importers on each run
 - this will allow for gradual testing and moving to a new approach

@@ -21,87 +21,6 @@ func FileRepositoryDir() string {
 	return homeDir + "/.config/tilbit/data/"
 }
 
-func AllTilbits() (tilbits []Tilbit) {
-	sources := LoadSources()
-
-	for _, source := range sources {
-		tilbits = append(tilbits, source.Tilbits...)
-	}
-	return
-}
-
-func ByQuery(query string, inputTilbits []Tilbit) (tilbits []Tilbit, err error) {
-	if len(inputTilbits) == 0 {
-		inputTilbits = AllTilbits()
-	}
-
-	if query == "all" {
-		tilbits = inputTilbits
-	} else if query == "random" {
-		randTil := getRandomBit(inputTilbits)
-		tilbits = append(tilbits, randTil)
-	} else {
-		ids := ParseIdsFromString(query)
-
-		var err error
-		tilbits, err = ByIds(ids, inputTilbits)
-		return tilbits, err
-	}
-	return
-}
-
-func ById(hash string, inputTilbits []Tilbit) (tilbit Tilbit, err error) {
-	tilbits, err := ByIds([]string{hash}, inputTilbits)
-	if len(tilbits) > 0 {
-		tilbit = tilbits[0]
-	}
-
-	return
-}
-
-func ByIds(hashes []string, inputTilbits []Tilbit) (foundBits []Tilbit, err error) {
-	foundMap := map[string]Tilbit{}
-
-	for _, hash := range hashes {
-		for _, tilbit := range inputTilbits {
-			if strings.Contains(tilbit.Id(), hash) {
-				foundMap[hash] = tilbit
-				break
-			}
-		}
-		_, found := foundMap[hash]
-		if !found {
-			return []Tilbit{}, errors.New(fmt.Sprintf("Tilbit for id=[%s] not found", hash))
-		}
-	}
-	for _, item := range foundMap {
-		foundBits = append(foundBits, item)
-	}
-
-	return foundBits, nil
-}
-
-func LoadSources() (sources []Source) {
-	files, err := ioutil.ReadDir(FileRepositoryDir())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, file := range files {
-		name := FileRepositoryDir() + file.Name()
-
-		if !file.IsDir() {
-			bits := parseFile(name)
-			var source Source
-			source.Tilbits = bits
-			source.Uri = name
-
-			sources = append(sources, source)
-		}
-	}
-	return
-}
-
 func getRandomBit(tilbits []Tilbit) (randomTilbit Tilbit) {
 	rand.Seed(time.Now().UnixNano())
 	randomTilbit = tilbits[rand.Intn(len(tilbits))]
@@ -124,5 +43,102 @@ func parseFile(fileString string) (tilbits []Tilbit) {
 	} else {
 		err, tilbits = ParseTextFile(string(data), fileString)
 	}
+	return
+}
+
+type Repository interface {
+	All() ([]Tilbit, error)
+	ById(hash string) ([]Tilbit, error)
+	ByIds(hashes []string) ([]Tilbit, error)
+	ByQuery(hash string) ([]Tilbit, error)
+	Create(tilbit Tilbit) (*Tilbit, error)
+	Update(id int64, updated Tilbit) (*Tilbit, error)
+	Delete(id int64) error
+	Migrate() error
+}
+
+type LocalSourcesRepository struct {
+	loadedTilbits []Tilbit
+}
+
+func NewLocalSourcesRepository(inputTilbits []Tilbit) *LocalSourcesRepository {
+	if inputTilbits == nil {
+		inputTilbits = importAllSources()
+	}
+	return &LocalSourcesRepository{inputTilbits}
+}
+
+func (r *LocalSourcesRepository) ByIds(hashes []string) (foundBits []Tilbit, err error) {
+	foundMap := map[string]Tilbit{}
+
+	for _, hash := range hashes {
+		for _, tilbit := range r.loadedTilbits {
+			if strings.Contains(tilbit.Id(), hash) {
+				foundMap[hash] = tilbit
+				break
+			}
+		}
+		_, found := foundMap[hash]
+		if !found {
+			return []Tilbit{}, errors.New(fmt.Sprintf("Tilbit for id=[%s] not found", hash))
+		}
+	}
+	for _, item := range foundMap {
+		foundBits = append(foundBits, item)
+	}
+
+	return foundBits, nil
+}
+
+func (r *LocalSourcesRepository) ById(hash string) (tilbit Tilbit, err error) {
+	tilbits, err := r.ByIds([]string{hash})
+	if len(tilbits) > 0 {
+		tilbit = tilbits[0]
+	}
+
+	return
+}
+
+func (r *LocalSourcesRepository) ByQuery(query string) (tilbits []Tilbit, err error) {
+
+	if query == "all" {
+		tilbits = r.loadedTilbits
+	} else if query == "random" {
+		randTil := getRandomBit(r.loadedTilbits)
+		tilbits = append(tilbits, randTil)
+	} else {
+		ids := ParseIdsFromString(query)
+
+		var err error
+		tilbits, err = r.ByIds(ids)
+		return tilbits, err
+	}
+	return
+}
+
+func importAllSources() (tilbits []Tilbit) {
+	var sources []Source
+
+	files, err := ioutil.ReadDir(FileRepositoryDir())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		name := FileRepositoryDir() + file.Name()
+
+		if !file.IsDir() {
+			bits := parseFile(name)
+			var source Source
+			source.Tilbits = bits
+			source.Uri = name
+
+			sources = append(sources, source)
+		}
+	}
+	for _, source := range sources {
+		tilbits = append(tilbits, source.Tilbits...)
+	}
+
 	return
 }
