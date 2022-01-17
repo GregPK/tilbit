@@ -43,6 +43,7 @@ location:
   uri: ""
   linenumber: 0
 dbid: 0
+dbhash: ""
 `
 	testza.AssertEqual(t, expected, string(out))
 }

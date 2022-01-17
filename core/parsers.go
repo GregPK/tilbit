@@ -44,13 +44,13 @@ func parseMarkdownBody(input string) (err error, tilbits []Tilbit) {
 
 		if len(strings.Trim(text, " \n")) == 0 && len(lastTilbitText) > 0 {
 			tilbitLineLen := strings.Count(lastTilbitText, "\n") + 1
-			tilbits = append(tilbits, Tilbit{strings.Trim(lastTilbitText, "\n"), SourceMetadata{}, SourceLocation{LineNumber: lineNumber - tilbitLineLen}, -1})
+			tilbits = append(tilbits, Tilbit{strings.Trim(lastTilbitText, "\n"), SourceMetadata{}, SourceLocation{LineNumber: lineNumber - tilbitLineLen}, -1, ""})
 			lastTilbitText = ""
 			continue
 		}
 		lastTilbitText += fmt.Sprintln(text)
 	}
-	tilbits = append(tilbits, Tilbit{strings.Trim(lastTilbitText, "\n"), SourceMetadata{}, SourceLocation{LineNumber: lineNumber}, -1})
+	tilbits = append(tilbits, Tilbit{strings.Trim(lastTilbitText, "\n"), SourceMetadata{}, SourceLocation{LineNumber: lineNumber}, -1, ""})
 
 	return
 }

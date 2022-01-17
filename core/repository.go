@@ -52,20 +52,18 @@ type Repository interface {
 	ByIds(hashes []string) ([]Tilbit, error)
 	ByQuery(hash string) ([]Tilbit, error)
 	Create(tilbit Tilbit) (*Tilbit, error)
+	Seed(tilbits []Tilbit) error
 	// Update(id int64, updated Tilbit) (*Tilbit, error)
 	// Delete(id int64) error
-	Migrate() error
+	Setup() error
 }
 
 type LocalSourcesRepository struct {
 	loadedTilbits []Tilbit
 }
 
-func NewLocalSourcesRepository(inputTilbits []Tilbit) Repository {
-	if inputTilbits == nil {
-		inputTilbits = importAllSources()
-	}
-	return &LocalSourcesRepository{inputTilbits}
+func NewLocalSourcesRepository() Repository {
+	return &LocalSourcesRepository{}
 }
 
 func (r *LocalSourcesRepository) ByIds(hashes []string) (foundBits []Tilbit, err error) {
@@ -115,13 +113,21 @@ func (r *LocalSourcesRepository) ByQuery(query string) (tilbits []Tilbit, err er
 	return
 }
 
+func (r *LocalSourcesRepository) Seed(tilbits []Tilbit) error {
+	if len(tilbits) == 0 {
+		tilbits = importAllSources()
+	}
+	r.loadedTilbits = tilbits
+	return nil
+}
+
 func (r *LocalSourcesRepository) All() (tilbits []Tilbit, err error) {
 	return r.loadedTilbits, nil
 }
 func (r *LocalSourcesRepository) Create(tilbit Tilbit) (*Tilbit, error) {
 	return nil, nil
 }
-func (r *LocalSourcesRepository) Migrate() error {
+func (r *LocalSourcesRepository) Setup() error {
 	return nil
 }
 

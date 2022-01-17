@@ -16,7 +16,8 @@ func ShowCmd(inputTilbits ...core.Tilbit) *cobra.Command {
 		Long:  `Shows a specific TILBit when given ID, shows randon otherwise`,
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			repo := core.NewLocalSourcesRepository(inputTilbits)
+			repo := core.NewLocalSourcesRepository()
+			repo.Seed(inputTilbits)
 			tilbits, err := repo.ByQuery(args[0])
 			if err != nil {
 				panic(err)

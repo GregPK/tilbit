@@ -10,7 +10,8 @@ type Tilbit struct {
 	Text     string
 	Data     SourceMetadata
 	Location SourceLocation
-	DbID     int64 // Temporary field for database transition
+	DbID     int64  // Temporary field for database transition
+	DbHash   string // Temporary field for database transition
 }
 
 func (t Tilbit) Id() string {
