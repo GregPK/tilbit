@@ -48,12 +48,12 @@ func parseFile(fileString string) (tilbits []Tilbit) {
 
 type Repository interface {
 	All() ([]Tilbit, error)
-	ById(hash string) ([]Tilbit, error)
+	ById(hash string) (Tilbit, error)
 	ByIds(hashes []string) ([]Tilbit, error)
 	ByQuery(hash string) ([]Tilbit, error)
 	Create(tilbit Tilbit) (*Tilbit, error)
-	Update(id int64, updated Tilbit) (*Tilbit, error)
-	Delete(id int64) error
+	// Update(id int64, updated Tilbit) (*Tilbit, error)
+	// Delete(id int64) error
 	Migrate() error
 }
 
@@ -61,7 +61,7 @@ type LocalSourcesRepository struct {
 	loadedTilbits []Tilbit
 }
 
-func NewLocalSourcesRepository(inputTilbits []Tilbit) *LocalSourcesRepository {
+func NewLocalSourcesRepository(inputTilbits []Tilbit) Repository {
 	if inputTilbits == nil {
 		inputTilbits = importAllSources()
 	}
@@ -73,7 +73,7 @@ func (r *LocalSourcesRepository) ByIds(hashes []string) (foundBits []Tilbit, err
 
 	for _, hash := range hashes {
 		for _, tilbit := range r.loadedTilbits {
-			if strings.Contains(tilbit.Id(), hash) {
+			if strings.Contains(tilbit.Hash(), hash) {
 				foundMap[hash] = tilbit
 				break
 			}
@@ -100,7 +100,6 @@ func (r *LocalSourcesRepository) ById(hash string) (tilbit Tilbit, err error) {
 }
 
 func (r *LocalSourcesRepository) ByQuery(query string) (tilbits []Tilbit, err error) {
-
 	if query == "all" {
 		tilbits = r.loadedTilbits
 	} else if query == "random" {
@@ -114,6 +113,16 @@ func (r *LocalSourcesRepository) ByQuery(query string) (tilbits []Tilbit, err er
 		return tilbits, err
 	}
 	return
+}
+
+func (r *LocalSourcesRepository) All() (tilbits []Tilbit, err error) {
+	return r.loadedTilbits, nil
+}
+func (r *LocalSourcesRepository) Create(tilbit Tilbit) (*Tilbit, error) {
+	return nil, nil
+}
+func (r *LocalSourcesRepository) Migrate() error {
+	return nil
 }
 
 func importAllSources() (tilbits []Tilbit) {

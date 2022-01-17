@@ -6,15 +6,19 @@ import (
 	"github.com/MarvinJWendt/testza"
 )
 
-func repo() (r *LocalSourcesRepository, tilIds []string) {
-	var tilbits []Tilbit
-	tilbits = append(tilbits, Tilbit{"One", SourceMetadata{}, SourceLocation{}})
-	tilbits = append(tilbits, Tilbit{"Two", SourceMetadata{}, SourceLocation{}})
-	tilbits = append(tilbits, Tilbit{"Three", SourceMetadata{}, SourceLocation{}})
-	for _, t := range tilbits {
-		tilIds = append(tilIds, t.Id())
-	}
-	return NewLocalSourcesRepository(tilbits), tilIds
+func tb(name string) (tilbit Tilbit) {
+	return Tilbit{name, SourceMetadata{}, SourceLocation{}, -1}
+}
+
+func seedBits() (tilbits []Tilbit) {
+	tilbits = append(tilbits, tb("One"))
+	tilbits = append(tilbits, tb("Two"))
+	tilbits = append(tilbits, tb("Three"))
+	return
+}
+
+func repo() (r Repository) {
+	return NewLocalSourcesRepository(seedBits())
 }
 
 func Benchmark_AllTilbits(b *testing.B) {
@@ -24,26 +28,27 @@ func Benchmark_AllTilbits(b *testing.B) {
 }
 
 func TestByQuery(t *testing.T) {
-	repo, tilIds := repo()
+	repo := repo()
+
+	repoBits := seedBits()
 
 	allBits, err := repo.ByQuery("all")
 
 	testza.AssertNil(t, err)
 	testza.AssertEqualValues(t, 3, len(allBits))
-	testza.AssertContains(t, allBits, repo.loadedTilbits[0])
-	testza.AssertContains(t, allBits, repo.loadedTilbits[1])
-	testza.AssertContains(t, allBits, repo.loadedTilbits[2])
+	testza.AssertContains(t, allBits, repoBits[0])
+	testza.AssertContains(t, allBits, repoBits[1])
+	testza.AssertContains(t, allBits, repoBits[2])
 
 	randomBit, err := repo.ByQuery("random")
 
 	testza.AssertNil(t, err)
 	testza.AssertEqualValues(t, 1, len(randomBit))
-	testza.AssertContains(t, tilIds, randomBit[0].Id())
-	println(tilIds)
+	testza.AssertContains(t, repoBits, randomBit[0])
 
-	idBit, err := repo.ByQuery(tilIds[0])
+	idBit, err := repo.ByQuery(repoBits[0].Hash())
 
 	testza.AssertNil(t, err)
 	testza.AssertEqualValues(t, 1, len(idBit))
-	testza.AssertEqualValues(t, idBit[0].Id(), tilIds[0])
+	testza.AssertEqualValues(t, idBit[0].Hash(), repoBits[0].Hash())
 }

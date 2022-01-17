@@ -1,9 +1,7 @@
 package core
 
 import (
-	"crypto/md5"
 	"fmt"
-	"io"
 	"math"
 	"math/rand"
 	"os"
@@ -150,16 +148,6 @@ func MakeTilLine(content string, source string) (tilLine string) {
 
 	tilLine = fmt.Sprintf("%s, {\"source\": \"%s\", addedOn:\"%s\"}\n\n", content, source, addedOn)
 	return
-}
-
-func (t Tilbit) Id() string {
-	return t.Hash()[:8]
-}
-
-func (t Tilbit) Hash() string {
-	h := md5.New()
-	io.WriteString(h, t.Text)
-	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func isoDate(timeToFormat time.Time) string {
