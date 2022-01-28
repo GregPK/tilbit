@@ -6,10 +6,11 @@ import (
 )
 
 type Configuration struct {
-	outputFormat string
+	outputFormat    string
+	sourceDirectory string
 }
 
-var Config = Configuration{"box"}
+var Config = Configuration{"box", ""}
 
 func RootCmd(inputTilbits ...core.Tilbit) *cobra.Command {
 	rcmd := cobra.Command{

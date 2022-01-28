@@ -151,3 +151,8 @@ func (r *SQLiteRepository) ByQuery(query string) (tilbits []Tilbit, err error) {
 	}
 	return
 }
+
+func (r *SQLiteRepository) SetSourceURI(source string) error {
+	// no-op, will be used later for passing in file
+	return nil
+}

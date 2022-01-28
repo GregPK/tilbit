@@ -56,10 +56,12 @@ type Repository interface {
 	// Update(id int64, updated Tilbit) (*Tilbit, error)
 	// Delete(id int64) error
 	Setup() error
+	SetSourceURI(source string) error
 }
 
 type LocalSourcesRepository struct {
 	loadedTilbits []Tilbit
+	sourceUri     string
 }
 
 func NewLocalSourcesRepository() Repository {
@@ -115,7 +117,7 @@ func (r *LocalSourcesRepository) ByQuery(query string) (tilbits []Tilbit, err er
 
 func (r *LocalSourcesRepository) Seed(tilbits []Tilbit) error {
 	if len(tilbits) == 0 {
-		tilbits = importAllSources()
+		tilbits = r.importAllSources()
 	}
 	r.loadedTilbits = tilbits
 	return nil
@@ -130,17 +132,28 @@ func (r *LocalSourcesRepository) Create(tilbit Tilbit) (*Tilbit, error) {
 func (r *LocalSourcesRepository) Setup() error {
 	return nil
 }
+func (r *LocalSourcesRepository) SetSourceURI(source string) error {
+	r.sourceUri = source
+	return nil
+}
 
-func importAllSources() (tilbits []Tilbit) {
+func (r *LocalSourcesRepository) importAllSources() (tilbits []Tilbit) {
 	var sources []Source
 
-	files, err := ioutil.ReadDir(FileRepositoryDir())
+	sourceDir := r.sourceUri
+
+	if len(sourceDir) == 0 {
+		sourceDir = FileRepositoryDir()
+	}
+	println(sourceDir)
+
+	files, err := ioutil.ReadDir(sourceDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _, file := range files {
-		name := FileRepositoryDir() + file.Name()
+		name := sourceDir + file.Name()
 
 		if !file.IsDir() {
 			bits := parseFile(name)
