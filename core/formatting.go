@@ -3,15 +3,10 @@ package core
 import (
 	"fmt"
 	"math"
-	"math/rand"
-	"os"
-	"strings"
 	"time"
 
-	"github.com/Delta456/box-cli-maker/v2"
 	"github.com/eidolon/wordwrap"
-	"github.com/mattn/go-runewidth"
-	"golang.org/x/term"
+	"github.com/pterm/pterm"
 	"gopkg.in/yaml.v2"
 )
 
@@ -28,54 +23,16 @@ func GetBitString(tilbit Tilbit, format string) (str string, err error) {
 }
 
 func printBox(tilbit Tilbit) {
-	text, wrapWidth := wrapText(tilbit.Text)
+	text, _ := wrapText(tilbit.Text)
 	footerId := printFooter(tilbit, true, false)
 	footer := printFooter(tilbit, false, false)
-	const boxMargin = 5
 
-	Box := box.New(box.Config{Px: 1, Py: 0, Type: "Single", Color: randomColor(), TitlePos: "Top"})
-
-	var title, body string
-
-	if len(footerId) < int(wrapWidth)-boxMargin {
-		title, body = footerId, text
-	} else if len(footer) < int(wrapWidth)-boxMargin {
-		title = footer
-		body = fmt.Sprintf("%s\n(#%s)", text, tilbit.Id())
-	} else {
-		title = tilbit.Id()
-		wrappedFooter, _ := wrapText(footer)
-		body = fmt.Sprintf("%s\n%s", text, wrappedFooter)
-	}
-	// Edge case: When title is longer than body pad the body
-	if runewidth.StringWidth(title) > runewidth.StringWidth(text) {
-		paddingLen := runewidth.StringWidth(title) - runewidth.StringWidth(text) + 8
-		if paddingLen > 0 {
-			// Another edge case, when there is a newline and ID that pads the body, but the width stays too small
-			if strings.Contains(body, "\n") {
-				body = strings.Replace(body, "\n", strings.Repeat(" ", paddingLen)+"\n", 1)
-			} else {
-				body += strings.Repeat(" ", paddingLen)
-			}
-		}
-	}
-	// The Box library sometimes panics, we want to be able to recover from that and show the culprit.
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("Recovering from panic for id:", tilbit.Id(), r)
-			fmt.Println("[", title, "]")
-			fmt.Println("[", body, "]")
-			fmt.Println("[", text, "]")
-		}
-	}()
-	Box.Print(title, body)
-
-	return
+	println(footer)
+	pterm.DefaultBox.WithTitle(footerId).WithTitleBottomRight().WithRightPadding(0).WithBottomPadding(0).Println(text)
 }
 
 func printString(tilbit Tilbit) (text string) {
 	text = tilbit.Text + "\n" + printFooter(tilbit, true, true)
-	text, _ = wrapText(text)
 
 	return
 }
@@ -95,11 +52,11 @@ var defTermSize = 120
 // Wraps and pads the body text based on the terminal size
 // Returns the result text and the wrapped size
 func wrapText(text string) (wrapped string, wrapWidth uint) {
-	termSize, _, _ := term.GetSize(int(os.Stdin.Fd()))
+	termSize := pterm.GetTerminalWidth()
 	if termSize < 1 { // probably running headless
 		termSize = defTermSize
 	}
-	wrapWidth = uint(math.Min(float64(defTermSize), float64(termSize)-10))
+	wrapWidth = uint(math.Min(float64(defTermSize), float64(termSize)-3))
 
 	if len(text) >= int(wrapWidth) {
 		wrapper := wordwrap.Wrapper(int(wrapWidth), true)
@@ -112,10 +69,6 @@ func wrapText(text string) (wrapped string, wrapWidth uint) {
 }
 
 func printFooter(tilbit Tilbit, appendId bool, indent bool) (footer string) {
-	if indent {
-		footer += "   -- "
-	}
-
 	if tilbit.Data.Author != "" {
 		footer += tilbit.Data.Author
 	}
@@ -130,17 +83,6 @@ func printFooter(tilbit Tilbit, appendId bool, indent bool) (footer string) {
 	}
 
 	return
-}
-
-func randomColor() string {
-	rand.Seed(time.Now().UnixNano())
-	colors := []string{"Black", "Blue", "Red", "Green", "Yellow", "Cyan", "Magenta", "White"}
-	randomIndex := rand.Intn(len(colors))
-	color := colors[randomIndex]
-	if rand.Intn(2) == 1 || true {
-		color = "Hi" + color
-	}
-	return color
 }
 
 func MakeTilLine(content string, source string) (tilLine string) {
