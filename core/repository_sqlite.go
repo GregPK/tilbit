@@ -46,18 +46,17 @@ func (r *SQLiteRepository) Setup() error {
 	);
 	`
 	_, err := r.db.Exec(query)
-	return err
-}
-
-func (r *SQLiteRepository) Seed(tilbits []Tilbit) error {
-	_, err := r.db.Exec("DELETE FROM tilbits;")
 	if err != nil {
 		return err
 	}
 
+	_, err = r.db.Exec("DELETE FROM tilbits;")
+	return err
+}
+
+func (r *SQLiteRepository) Import(tilbits []Tilbit) error {
 	for _, tilbit := range tilbits {
 		_, err := r.Create(tilbit)
-		// println(*t.DbID)
 		if err != nil {
 			return err
 		}

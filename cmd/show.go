@@ -16,10 +16,7 @@ func ShowCmd(inputTilbits ...core.Tilbit) *cobra.Command {
 		Long:  `Shows a specific TILBit when given ID, shows random otherwise`,
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			repo := core.NewLocalSourcesRepository()
-			repo.SetSourceURI(Config.sourceDirectory)
-			repo.Seed(inputTilbits)
-			tilbits, err := repo.ByQuery(args[0])
+			tilbits, err := core.GetTilbits(Config.sources, args[0], inputTilbits)
 			if err != nil {
 				panic(err)
 			}
@@ -30,6 +27,6 @@ func ShowCmd(inputTilbits ...core.Tilbit) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVarP(&Config.outputFormat, "output-format", "f", "box", "Output format for show command")
-	cmd.Flags().StringVarP(&Config.sourceDirectory, "source-dir", "d", "", "Source directory to look for files, leave empty for default lookup")
+	cmd.Flags().StringSliceVarP(&Config.sources, "source", "i", make([]string, 0), "Source list. Currently only handles directories. Ultimately will handle arbitrary URIs")
 	return &cmd
 }

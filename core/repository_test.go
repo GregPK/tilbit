@@ -20,12 +20,8 @@ func seedBits() (tilbits []Tilbit) {
 }
 
 func repo() (r Repository) {
-	if useNewDbRepo {
-		r = NewSQLiteRepository()
-	} else {
-		r = NewLocalSourcesRepository()
-	}
-	err := r.Seed(seedBits())
+	r = NewSQLiteRepository()
+	err := r.Import(seedBits())
 	if err != nil {
 		panic(err)
 	}
@@ -41,7 +37,7 @@ func hashes(tilbits []Tilbit) (hashes []string) {
 
 func Benchmark_AllTilbits(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		NewLocalSourcesRepository()
+		NewSQLiteRepository()
 	}
 }
 
