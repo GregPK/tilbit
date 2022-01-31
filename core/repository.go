@@ -41,6 +41,9 @@ func GetTilbits(sources []string, query string, inputTilbits []Tilbit) (tilbits 
 		repo.Import(inputTilbits)
 		sources = append(sources, "")
 	} else {
+		if len(sources) == 0 {
+			sources = append(sources, FileRepositoryDir())
+		}
 		for _, source := range sources {
 			bits, _ := ParseSource(source)
 			repo.Import(bits)
