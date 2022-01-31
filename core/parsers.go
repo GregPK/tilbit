@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -37,7 +38,7 @@ func ParseSource(source string) (tilbits []Tilbit, err error) {
 func parseDirectory(source string) (tilbits []Tilbit, err error) {
 	files, err := ioutil.ReadDir(source)
 	for _, file := range files {
-		name := source + file.Name()
+		name := filepath.Join(source, file.Name())
 
 		if !file.IsDir() {
 			bits, fileerr := parseFile(name)
