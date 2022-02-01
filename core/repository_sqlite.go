@@ -121,6 +121,9 @@ func (r *SQLiteRepository) scanRows(where string) (all []Tilbit, err error) {
 			return nil, err
 		}
 
+		tilbit.Data = source
+		tilbit.Location = sourceLoc
+
 		all = append(all, tilbit)
 	}
 	return

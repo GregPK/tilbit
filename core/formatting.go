@@ -25,9 +25,8 @@ func GetBitString(tilbit Tilbit, format string) (str string, err error) {
 func printBox(tilbit Tilbit) {
 	text, _ := wrapText(tilbit.Text)
 	footerId := printFooter(tilbit, true, false)
-	footer := printFooter(tilbit, false, false)
+	// footer := printFooter(tilbit, false, false)
 
-	println(footer)
 	pterm.DefaultBox.WithTitle(footerId).WithTitleBottomRight().WithRightPadding(0).WithBottomPadding(0).Println(text)
 }
 
