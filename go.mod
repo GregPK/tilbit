@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/Delta456/box-cli-maker/v2 v2.2.2
 	github.com/MarvinJWendt/testza v0.2.0
+	github.com/charmbracelet/lipgloss v0.4.0 // indirect
 	github.com/eidolon/wordwrap v0.0.0-20161011182207-e0f54129b8bb
 	github.com/mattn/go-runewidth v0.0.13
 	github.com/mattn/go-sqlite3 v1.14.10 // indirect

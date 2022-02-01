@@ -3,8 +3,11 @@ package core
 import (
 	"fmt"
 	"math"
+	"math/rand"
+	"strconv"
 	"time"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/eidolon/wordwrap"
 	"github.com/pterm/pterm"
 	"gopkg.in/yaml.v2"
@@ -23,6 +26,37 @@ func GetBitString(tilbit Tilbit, format string) (str string, err error) {
 }
 
 func printBox(tilbit Tilbit) {
+	rand.Seed(time.Now().UnixNano())
+
+	color := strconv.Itoa(rand.Intn(15))
+	dialogBoxStyle := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color(color)).
+		Padding(0, 1).
+		BorderTop(true).
+		BorderLeft(true).
+		BorderRight(true).
+		BorderBottom(true)
+
+	subtle := lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#383838"}
+
+	_, width := wrapText(tilbit.Text)
+	footerId := printFooter(tilbit, true, false)
+	// footer := printFooter(tilbit, false, false)
+
+	question := lipgloss.NewStyle().Width(width - 1).Align(lipgloss.Left).Render(tilbit.Text + "\n" + footerId)
+
+	dialog := lipgloss.Place(width, -1,
+		lipgloss.Left, lipgloss.Left,
+		dialogBoxStyle.Render(question),
+		// lipgloss.WithWhitespaceChars("猫咪"),
+		lipgloss.WithWhitespaceForeground(subtle),
+	)
+
+	fmt.Print(dialog)
+}
+
+func printPtermBox(tilbit Tilbit) {
 	text, _ := wrapText(tilbit.Text)
 	footerId := printFooter(tilbit, true, false)
 	// footer := printFooter(tilbit, false, false)
@@ -50,12 +84,12 @@ var defTermSize = 120
 
 // Wraps and pads the body text based on the terminal size
 // Returns the result text and the wrapped size
-func wrapText(text string) (wrapped string, wrapWidth uint) {
+func wrapText(text string) (wrapped string, wrapWidth int) {
 	termSize := pterm.GetTerminalWidth()
 	if termSize < 1 { // probably running headless
 		termSize = defTermSize
 	}
-	wrapWidth = uint(math.Min(float64(defTermSize), float64(termSize)-3))
+	wrapWidth = int(math.Min(float64(defTermSize), float64(termSize)-3))
 
 	if len(text) >= int(wrapWidth) {
 		wrapper := wordwrap.Wrapper(int(wrapWidth), true)
