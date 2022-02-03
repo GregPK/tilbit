@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eidolon/wordwrap"
 	"github.com/pterm/pterm"
@@ -38,19 +39,32 @@ func printBox(tilbit Tilbit) {
 		BorderRight(true).
 		BorderBottom(true)
 
-	subtle := lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#383838"}
-
 	_, width := wrapText(tilbit.Text)
 	footerId := printFooter(tilbit, true, false)
 	// footer := printFooter(tilbit, false, false)
 
-	question := lipgloss.NewStyle().Width(width - 1).Align(lipgloss.Left).Render(tilbit.Text + "\n" + footerId)
+	style := `
+	{
+		"document": {
+			"block_prefix": "",
+			"block_suffix": "",
+			"margin": 0
+		}
+	}
+	`
+
+	r, _ := glamour.NewTermRenderer(
+		glamour.WithAutoStyle(),
+		glamour.WithWordWrap(0),
+		glamour.WithStylesFromJSONBytes([]byte(style)),
+	)
+	out, _ := r.Render(tilbit.Text)
+
+	question := lipgloss.NewStyle().Width(width - 1).Align(lipgloss.Left).Render(out + "\n" + footerId)
 
 	dialog := lipgloss.Place(width, -1,
 		lipgloss.Left, lipgloss.Left,
 		dialogBoxStyle.Render(question),
-		// lipgloss.WithWhitespaceChars("猫咪"),
-		lipgloss.WithWhitespaceForeground(subtle),
 	)
 
 	fmt.Print(dialog)
