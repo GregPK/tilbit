@@ -17,6 +17,8 @@ import (
 func GetBitString(tilbit Tilbit, format string) (str string, err error) {
 	if format == "box" {
 		printBox(tilbit)
+	} else if format == "block" {
+		str = Block(tilbit)
 	} else if format == "yaml" {
 		str = printYaml(tilbit)
 	} else {
@@ -43,6 +45,18 @@ func printBox(tilbit Tilbit) {
 	footerId := printFooter(tilbit, true, false)
 	// footer := printFooter(tilbit, false, false)
 
+	out := PrintMarkdown(tilbit.Text)
+	question := lipgloss.NewStyle().Width(width - 1).Align(lipgloss.Left).Render(out + "\n" + footerId)
+
+	dialog := lipgloss.Place(width, -1,
+		lipgloss.Left, lipgloss.Left,
+		dialogBoxStyle.Render(question),
+	)
+
+	fmt.Print(dialog)
+}
+
+func PrintMarkdown(text string) (out string) {
 	style := `
 	{
 		"document": {
@@ -58,16 +72,8 @@ func printBox(tilbit Tilbit) {
 		glamour.WithWordWrap(0),
 		glamour.WithStylesFromJSONBytes([]byte(style)),
 	)
-	out, _ := r.Render(tilbit.Text)
-
-	question := lipgloss.NewStyle().Width(width - 1).Align(lipgloss.Left).Render(out + "\n" + footerId)
-
-	dialog := lipgloss.Place(width, -1,
-		lipgloss.Left, lipgloss.Left,
-		dialogBoxStyle.Render(question),
-	)
-
-	fmt.Print(dialog)
+	out, _ = r.Render(text)
+	return
 }
 
 func printPtermBox(tilbit Tilbit) {
