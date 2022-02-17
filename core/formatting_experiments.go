@@ -39,16 +39,17 @@ func Block(tilbit Tilbit) string {
 	// 	Margin(1, 2).
 	// Width(80)
 
+	maxWidth := pterm.GetTerminalWidth() - 2
+
 	bodyStyle := lipgloss.NewStyle().
 		Align(lipgloss.Left).
 		Padding(1, 2).
 		Margin(0, 1).
 		Background(lipgloss.Color(style.bg)).
 		Foreground(lipgloss.Color(style.fg)).
-		Width(pterm.GetTerminalWidth() - 2)
+		Width(maxWidth)
 
 	var source string
-	var author string
 	// var addedOn string
 	var id string
 
@@ -56,17 +57,17 @@ func Block(tilbit Tilbit) string {
 		Background(lipgloss.Color(style.bg)).
 		Foreground(lipgloss.Color(style.fg)).
 		Margin(0, 1).
-		Padding(0, 2)
+		Padding(0, 2).
+		MaxWidth(maxWidth - 10)
 
-
-	sourceStr = tilbit.Data.Source
-
-	tilbit.Data.Author
-	if  != "" {
-		source = barStyle.Render(tilbit.Data.Source)
-	}
+	titleStr := tilbit.Data.Source
 	if tilbit.Data.Author != "" {
-		author +=
+		titleStr += " – " + tilbit.Data.Author
+	}
+
+	w := lipgloss.Width
+	if titleStr != "" {
+		source = barStyle.Render(tilbit.Data.Source)
 	}
 	// if tilbit.Data.AddedOn != "" {
 	// addedOn = lipgloss.NewStyle().Render(tilbit.Data.AddedOn)
@@ -75,7 +76,6 @@ func Block(tilbit Tilbit) string {
 
 	styleLine := "" // style.bg + " / " + style.fg + "\n"
 	body := bodyStyle.Render(styleLine + tilbit.Text)
-	w := lipgloss.Width
 	gap := lipgloss.NewStyle().Width(w(body) - w(source) - w(id) - 1).Render("")
 	bar := lipgloss.JoinHorizontal(lipgloss.Top,
 		source,
